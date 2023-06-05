@@ -25,5 +25,7 @@ class S3AptRepositoryPluginTest {
         val project = ProjectBuilder.builder().build()
         project.pluginManager.apply("com.liftric.s3-apt-repository-plugin")
         assertNotNull(project.tasks.findByName("uploadDebian"))
+        assertNotNull(project.tasks.findByName("cleanDebian"))
+        assertNotNull(project.tasks.findByName("deleteDebian"))
     }
 }
