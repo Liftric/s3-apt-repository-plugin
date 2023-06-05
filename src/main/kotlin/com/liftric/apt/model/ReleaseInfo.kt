@@ -2,6 +2,26 @@ package com.liftric.apt.model
 
 import java.io.File
 
+/**
+ * The ReleaseInfo data class represents the metadata of a repository in an apt system.
+ * This metadata typically resides in "Release" files within the repository and provides essential
+ * details about the repository, such as its origin, label, suite, components, architectures, and
+ * various other properties.
+ *
+ * In addition to the repository's attributes, this class includes methods for constructing a string representation
+ * of the repository's metadata, suitable for inclusion in a "Release" file.
+ *
+ * The `toFileString` method generates a string representation of a ReleaseInfo object that follows
+ * the conventional formatting in "Release" files. This makes it easy to write the repository's metadata back
+ * to the apt system.
+ *
+ * The `parseReleaseFile` method reads a "Release" file and populates a ReleaseInfo object with its contents. It
+ * creates and returns a new ReleaseInfo instance, representing the metadata of the repository described by the "Release" file.
+ *
+ * The MD5Sum, SHA1, SHA256, and SHA512 data classes represent different types of checksums for the package indexes in the repository.
+ * These checksums are typically included in "Release" files to ensure the integrity and authenticity of the package indexes.
+ */
+
 const val DEFAULT_ORIGIN = "Debian"
 const val DEFAULT_LABEL = "Debian"
 const val DEFAULT_SUITE = "stable"

@@ -9,7 +9,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.provider.Property
 import java.io.Serializable
 
-data class DebianFile(
+data class Package(
     val file: RegularFileProperty,
     val architectures: SetProperty<String>,
     val bucket: String?,
@@ -25,7 +25,7 @@ data class DebianFile(
 
 @Suppress("MemberVisibilityCanBePrivate")
 @ConfigDsl
-class DebianFileBuilder(@get:Internal val project: Project) {
+class PackageBuilder(@get:Internal val project: Project) {
     @get:Input
     val file: RegularFileProperty = project.objects.fileProperty()
 
@@ -68,7 +68,7 @@ class DebianFileBuilder(@get:Internal val project: Project) {
     @get:Optional
     val packageVersion: Property<String?> = project.objects.property(String::class.java)
 
-    fun build(): DebianFile = DebianFile(
+    fun build(): Package = Package(
         file = file,
         architectures = architectures,
         bucket = bucket.orNull,

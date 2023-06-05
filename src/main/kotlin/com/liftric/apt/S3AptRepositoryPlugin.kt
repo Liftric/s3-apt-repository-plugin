@@ -1,6 +1,6 @@
 package com.liftric.apt
 
-import com.liftric.apt.extensions.S3AptRepositoryExtension
+import com.liftric.apt.extensions.PluginExtension
 import com.liftric.apt.tasks.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -11,7 +11,7 @@ internal const val taskGroup = "S3 Apt Repository Plugin"
 class S3AptRepositoryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val extension =
-            project.extensions.create(extensionName, S3AptRepositoryExtension::class.java, project)
+            project.extensions.create(extensionName, PluginExtension::class.java, project)
 
         project.tasks.register("uploadPackage", UploadPackageTask::class.java) { task ->
             task.group = taskGroup
@@ -55,7 +55,7 @@ class S3AptRepositoryPlugin : Plugin<Project> {
     }
 }
 
-fun Project.dependencyTrackCompanion(): S3AptRepositoryExtension {
-    return extensions.getByName(extensionName) as? S3AptRepositoryExtension
+fun Project.dependencyTrackCompanion(): PluginExtension {
+    return extensions.getByName(extensionName) as? PluginExtension
         ?: throw IllegalStateException("$extensionName is not of the correct type")
 }

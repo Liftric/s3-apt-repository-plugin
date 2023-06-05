@@ -1,7 +1,7 @@
 package com.liftric.apt.tasks
 
 import com.liftric.apt.service.AwsS3Client
-import com.liftric.apt.extensions.DebianFileBuilder
+import com.liftric.apt.extensions.PackageBuilder
 import com.liftric.apt.model.*
 import com.liftric.apt.service.*
 import org.gradle.api.DefaultTask
@@ -28,7 +28,7 @@ abstract class RemovePackageTask : DefaultTask() {
     abstract val bucketPath: Property<String>
 
     @get:Nested
-    abstract val debianFiles: ListProperty<DebianFileBuilder>
+    abstract val debianFiles: ListProperty<PackageBuilder>
 
     @get:Input
     @get:Optional

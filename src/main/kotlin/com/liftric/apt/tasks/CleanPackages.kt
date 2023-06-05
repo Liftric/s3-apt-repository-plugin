@@ -1,5 +1,6 @@
 package com.liftric.apt.tasks
 
+import com.liftric.apt.service.AwsS3Client
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.*
@@ -37,5 +38,7 @@ abstract class CleanPackagesTask : DefaultTask() {
         val regionValue = region.get()
         val bucketValue = bucket.get()
         val bucketPathValue = bucketPath.get()
+
+        val s3Client = AwsS3Client(accessKeyValue, secretKeyValue, regionValue)
     }
 }
