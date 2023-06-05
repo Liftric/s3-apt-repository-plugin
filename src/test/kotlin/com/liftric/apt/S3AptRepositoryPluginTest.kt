@@ -24,6 +24,6 @@ class S3AptRepositoryPluginTest {
     fun testTasks() {
         val project = ProjectBuilder.builder().build()
         project.pluginManager.apply("com.liftric.s3-apt-repository-plugin")
-        assertNotNull(project.tasks.findByName("updateRepo"))
+        assertNotNull(project.tasks.findByName("uploadDebian"))
     }
 }

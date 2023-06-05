@@ -13,7 +13,7 @@ class S3AptRepositoryPlugin : Plugin<Project> {
         val extension =
             project.extensions.create(extensionName, S3AptRepositoryExtension::class.java, project)
 
-        project.tasks.register("updateRepo", UpdateRepoTask::class.java) { task ->
+        project.tasks.register("uploadDebian", CleanDebianTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Upload Debian packages to S3 and update the repository"
             task.accessKey.set(extension.accessKey)

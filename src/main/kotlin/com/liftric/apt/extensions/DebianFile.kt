@@ -19,6 +19,8 @@ data class DebianFile(
     val secretKey: String?,
     val suite: String?,
     val component: String?,
+    val packageName: String?,
+    val packageVersion: String?,
 ) : Serializable
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -58,6 +60,14 @@ class DebianFileBuilder(@get:Internal val project: Project) {
     @get:Optional
     val component: Property<String?> = project.objects.property(String::class.java)
 
+    @get:Input
+    @get:Optional
+    val packageName: Property<String?> = project.objects.property(String::class.java)
+
+    @get:Input
+    @get:Optional
+    val packageVersion: Property<String?> = project.objects.property(String::class.java)
+
     fun build(): DebianFile = DebianFile(
         file = file,
         architectures = architectures,
@@ -68,5 +78,7 @@ class DebianFileBuilder(@get:Internal val project: Project) {
         secretKey = secretKey.orNull,
         suite = suite.orNull,
         component = component.orNull,
+        packageName = packageName.orNull,
+        packageVersion = packageVersion.orNull,
     )
 }

@@ -22,7 +22,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-abstract class UpdateRepoTask : DefaultTask() {
+abstract class UploadDebianTask : DefaultTask() {
     @get:Input
     abstract val accessKey: Property<String>
 
@@ -72,12 +72,16 @@ abstract class UpdateRepoTask : DefaultTask() {
             val bucketPath = debianFile.bucketPath.orNull ?: bucketPathValue
             val suite = debianFile.suite.orNull ?: DEFAULT_SUITE
             val component = debianFile.component.orNull ?: DEFAULT_COMPONENT
+            val packageName = debianFile.packageName.orNull
+            val packageVersion = debianFile.packageVersion.orNull
 
             val s3Client = AwsS3Client(accessKey, secretKey, region)
 
             val packagesInfo = PackagesInfoFactory(inputFile)
             val debianPoolBucketKey = getPoolBucketKey(inputFile.name, suite)
             packagesInfo.packagesInfo.fileName = debianPoolBucketKey
+            packagesInfo.packagesInfo.packageInfo = packageName ?: packagesInfo.packagesInfo.packageInfo
+            packagesInfo.packagesInfo.version = packageVersion ?: packagesInfo.packagesInfo.version
 
             uploadDebianFile(s3Client, bucket, bucketPath, debianPoolBucketKey, inputFile)
 
