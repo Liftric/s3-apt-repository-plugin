@@ -10,16 +10,27 @@ import org.gradle.api.provider.Property
 import java.io.Serializable
 
 data class Package(
+    /** The Package file to upload. Currently only Debian Files are supported */
     val file: RegularFileProperty,
+    /** List of supported Architectures from Package */
     val architectures: SetProperty<String>,
+    /** Optional: Used for override the default bucket */
     val bucket: String?,
+    /** Optional: Used for override the default bucket path */
     val bucketPath: String?,
+    /** Optional: Used for override the default region */
     val region: String?,
+    /** Optional: Used for override the default accessKey */
     val accessKey: String?,
+    /** Optional: Used for override the default secretKey */
     val secretKey: String?,
-    val suite: String?,
+    /** Optional: Used for override the default suite */
+    val suite: String?,//TODO Check if working
+    /** Optional: Used for override the default component */
     val component: String?,
+    /** Optional: Used for override the default package name */
     val packageName: String?,
+    /** Optional: Used for override the default package version */
     val packageVersion: String?,
 ) : Serializable
 

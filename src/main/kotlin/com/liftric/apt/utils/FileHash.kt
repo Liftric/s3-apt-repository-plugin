@@ -27,7 +27,7 @@ object FileHashUtil {
         val md = MessageDigest.getInstance("MD5")
         val inputStream = this.inputStream()
         return inputStream.use {
-            val buffer = ByteArray(1024 * 1024 * 8) // Buffer size
+            val buffer = ByteArray(1024 * 1024 * 8)
             var bytesRead = it.read(buffer)
 
             while (bytesRead > 0) {
@@ -45,7 +45,7 @@ object FileHashUtil {
         val md = MessageDigest.getInstance("SHA-1")
         val inputStream = this.inputStream()
         return inputStream.use {
-            val buffer = ByteArray(1024 * 1024 * 8) // Buffer size
+            val buffer = ByteArray(1024 * 1024 * 8)
             var bytesRead = it.read(buffer)
 
             while (bytesRead > 0) {
@@ -63,7 +63,7 @@ object FileHashUtil {
         val md = MessageDigest.getInstance("SHA-256")
         val inputStream = this.inputStream()
         return inputStream.use {
-            val buffer = ByteArray(1024 * 1024 * 8) // Buffer size
+            val buffer = ByteArray(1024 * 1024 * 8)
             var bytesRead = it.read(buffer)
 
             while (bytesRead > 0) {
@@ -81,7 +81,7 @@ object FileHashUtil {
         val md = MessageDigest.getInstance("SHA-512")
         val inputStream = this.inputStream()
         return inputStream.use {
-            val buffer = ByteArray(1024 * 1024 * 8) // Buffer size
+            val buffer = ByteArray(1024 * 1024 * 8)
             var bytesRead = it.read(buffer)
 
             while (bytesRead > 0) {
