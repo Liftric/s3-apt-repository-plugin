@@ -108,4 +108,12 @@ class AwsS3Client(
 
         return keys
     }
+
+    fun deleteObjects(bucket: String, keys: List<String>): DeleteObjectsResponse {
+        val request = DeleteObjectsRequest.builder()
+            .bucket(bucket)
+            .delete(Delete.builder().objects(keys.map { ObjectIdentifier.builder().key(it).build() }).build())
+            .build()
+        return s3Client.deleteObjects(request)
+    }
 }

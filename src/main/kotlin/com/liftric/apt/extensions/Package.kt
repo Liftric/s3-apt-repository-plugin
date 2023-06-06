@@ -24,10 +24,14 @@ data class Package(
     val accessKey: String?,
     /** Optional: Used for override the default secretKey */
     val secretKey: String?,
-    /** Optional: Used for override the default suite */
-    val suite: String?,//TODO Check if working
-    /** Optional: Used for override the default component */
+    /** Optional: Used for override the default Release suite */
+    val suite: String?,
+    /** Optional: Used for override the default Release component */
     val component: String?,
+    /** Optional: Used for override the default Release origin */
+    val origin: String?,
+    /** Optional: Used for override the default Release label */
+    val label: String?,
     /** Optional: Used for override the default package name */
     val packageName: String?,
     /** Optional: Used for override the default package version */
@@ -73,6 +77,14 @@ class PackageBuilder(@get:Internal val project: Project) {
 
     @get:Input
     @get:Optional
+    val origin: Property<String?> = project.objects.property(String::class.java)
+
+    @get:Input
+    @get:Optional
+    val label: Property<String?> = project.objects.property(String::class.java)
+
+    @get:Input
+    @get:Optional
     val packageName: Property<String?> = project.objects.property(String::class.java)
 
     @get:Input
@@ -89,6 +101,8 @@ class PackageBuilder(@get:Internal val project: Project) {
         secretKey = secretKey.orNull,
         suite = suite.orNull,
         component = component.orNull,
+        origin = origin.orNull,
+        label = label.orNull,
         packageName = packageName.orNull,
         packageVersion = packageVersion.orNull,
     )

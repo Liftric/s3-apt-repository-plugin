@@ -10,6 +10,7 @@ import com.liftric.apt.utils.FileHashUtil.size
 import com.liftric.apt.utils.signReleaseFile
 import org.gradle.api.logging.Logger
 import java.io.File
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -34,10 +35,44 @@ fun uploadDebianFile(
     }
 }
 
-fun getPoolBucketKey(fileName: String, suite: String): String {
+fun getPoolBucketKey(fileName: String, component: String): String {
     val firstLetter = fileName.substring(0, 1)
     val packageName = fileName.substringBefore("_")
-    return "pool/$suite/$firstLetter/$packageName/$fileName"
+    return "pool/$component/$firstLetter/$packageName/$fileName"
+}
+
+fun cleanPackages(logger: Logger, s3Client: AwsS3Client, bucket: String, bucketPath: String, suite: String, component: String) {
+    val usedPackages: Set<String> = getUsedPackagesPoolKeys(s3Client, bucket, bucketPath, suite, component)
+    val files: List<String> = s3Client.listAllObjects(bucket, getFullBucketKey(bucketPath, "pool/$component/"))
+    val filesToRemove = files.filter { !usedPackages.contains(it) }
+    if(filesToRemove.isEmpty()) {
+        logger.info("No files to remove")
+        return
+    }
+    val deletedObjects = s3Client.deleteObjects(bucket, filesToRemove)
+    logger.info("Deleted ${deletedObjects.deleted().size} objects")
+}
+
+private fun getUsedPackagesPoolKeys(
+    s3Client: AwsS3Client,
+    bucket: String,
+    bucketPath: String,
+    suite: String,
+    component: String,
+): Set<String> {
+    val files = s3Client.listAllObjects(bucket, getFullBucketKey(bucketPath, "dists/$suite/$component/binary-"))
+    val usedPackages = mutableSetOf<String>()
+    for (filePath in files) {
+        if (filePath.endsWith("Packages")) {
+            val file = s3Client.getObject(bucket, filePath)
+            val packagesInfo = readPackagesFile(file)
+
+            for (packageInfo in packagesInfo) {
+                packageInfo.fileName?.let { usedPackages.add(getFullBucketKey(bucketPath, it)) }
+            }
+        }
+    }
+    return usedPackages
 }
 
 fun updateReleaseFiles(
@@ -47,6 +82,8 @@ fun updateReleaseFiles(
     bucketPath: String,
     suite: String,
     component: String,
+    origin: String?,
+    label: String?,
     signingKeyRingFile: File? = null,
     signingKeyPassphrase: String? = null,
 ) {
@@ -62,6 +99,8 @@ fun updateReleaseFiles(
     }
 
     releaseInfo.architectures = getReleaseArchitecturesFromS3FileList(files)
+    origin?.let { releaseInfo.origin = it }
+    label?.let { releaseInfo.label = it }
 
     for (filePath in files) {
         val packageFile = s3Client.getObject(bucket, filePath)
@@ -154,7 +193,7 @@ fun updatePackagesFiles(
     return packagesFiles
 }
 
-fun cleanPackagesFiles(
+fun getCleanPackagesFiles(
     logger: Logger,
     archList: Set<String>,
     suite: String,
@@ -181,7 +220,7 @@ fun cleanPackagesFiles(
 }
 
 private fun getReleaseDate(): String {
-    val now = ZonedDateTime.now()
+    val now = ZonedDateTime.now(ZoneId.of("UTC"))
     val formatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
     return now.format(formatter)
 }

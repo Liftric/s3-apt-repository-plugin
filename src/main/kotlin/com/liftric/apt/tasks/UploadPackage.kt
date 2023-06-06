@@ -43,7 +43,7 @@ abstract class UploadPackageTask : DefaultTask() {
     abstract val signingKeyPassphrase: Property<String>
 
     @TaskAction
-    fun uploadPackage() {
+    fun main() {
         val debianFilesValues = debianFiles.get()
         val accessKeyValue = accessKey.get()
         val secretKeyValue = secretKey.get()
@@ -61,6 +61,8 @@ abstract class UploadPackageTask : DefaultTask() {
             val bucketPath = debianFile.bucketPath.orNull ?: bucketPathValue
             val suite = debianFile.suite.orNull ?: DEFAULT_SUITE
             val component = debianFile.component.orNull ?: DEFAULT_COMPONENT
+            val origin = debianFile.origin.orNull
+            val label = debianFile.label.orNull
             val packageName = debianFile.packageName.orNull
             val packageVersion = debianFile.packageVersion.orNull
             val signingKeyRingFileValue = signingKeyRingFile.orNull?.asFile
@@ -69,7 +71,7 @@ abstract class UploadPackageTask : DefaultTask() {
             val s3Client = AwsS3Client(accessKey, secretKey, region)
 
             val packagesInfo = PackagesInfoFactory(inputFile)
-            val debianPoolBucketKey = getPoolBucketKey(inputFile.name, suite)
+            val debianPoolBucketKey = getPoolBucketKey(inputFile.name, component)
             packagesInfo.packagesInfo.fileName = debianPoolBucketKey
             packagesInfo.packagesInfo.packageInfo = packageName ?: packagesInfo.packagesInfo.packageInfo
             packagesInfo.packagesInfo.version = packageVersion ?: packagesInfo.packagesInfo.version
@@ -105,6 +107,8 @@ abstract class UploadPackageTask : DefaultTask() {
                 bucketPath,
                 suite,
                 component,
+                origin,
+                label,
                 signingKeyRingFileValue,
                 signingKeyPassphraseValue
             )

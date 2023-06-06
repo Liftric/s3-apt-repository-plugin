@@ -26,6 +26,12 @@ abstract class PluginExtension(val project: Project) {
     /** PGP Signing of Release File */
     abstract val signingKeyRingFile: RegularFileProperty
     abstract val signingKeyPassphrase: Property<String>
+
+    /** Used for cleanPackages Task, Default: stable */
+    abstract val suite: Property<String>
+
+    /** Used for cleanPackages Task, Default: main */
+    abstract val component: Property<String>
 }
 
 fun PluginExtension.debian(action: PackageBuilder.() -> Unit) {

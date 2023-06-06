@@ -32,10 +32,6 @@ abstract class RemovePackageTask : DefaultTask() {
 
     @get:Input
     @get:Optional
-    abstract val override: Property<Boolean>
-
-    @get:Input
-    @get:Optional
     abstract val signingKeyRingFile: RegularFileProperty
 
     @get:Input
@@ -43,7 +39,7 @@ abstract class RemovePackageTask : DefaultTask() {
     abstract val signingKeyPassphrase: Property<String>
 
     @TaskAction
-    fun removePackage() {
+    fun main() {
         val debianFilesValues = debianFiles.get()
         val accessKeyValue = accessKey.get()
         val secretKeyValue = secretKey.get()
@@ -61,6 +57,8 @@ abstract class RemovePackageTask : DefaultTask() {
             val bucketPath = debianFile.bucketPath.orNull ?: bucketPathValue
             val suite = debianFile.suite.orNull ?: DEFAULT_SUITE
             val component = debianFile.component.orNull ?: DEFAULT_COMPONENT
+            val origin = debianFile.origin.orNull
+            val label = debianFile.label.orNull
             val packageName = debianFile.packageName.orNull
             val packageVersion = debianFile.packageVersion.orNull
             val signingKeyRingFileValue = signingKeyRingFile.orNull?.asFile
@@ -69,13 +67,11 @@ abstract class RemovePackageTask : DefaultTask() {
             val s3Client = AwsS3Client(accessKey, secretKey, region)
 
             val packagesInfo = PackagesInfoFactory(inputFile)
-            val debianPoolBucketKey = getPoolBucketKey(inputFile.name, suite)
-            packagesInfo.packagesInfo.fileName = debianPoolBucketKey
             packagesInfo.packagesInfo.packageInfo = packageName ?: packagesInfo.packagesInfo.packageInfo
             packagesInfo.packagesInfo.version = packageVersion ?: packagesInfo.packagesInfo.version
 
             val packagesFiles =
-                cleanPackagesFiles(
+                getCleanPackagesFiles(
                     logger,
                     archs,
                     suite,
@@ -95,6 +91,8 @@ abstract class RemovePackageTask : DefaultTask() {
                 bucketPath,
                 suite,
                 component,
+                origin,
+                label,
                 signingKeyRingFileValue,
                 signingKeyPassphraseValue
             )

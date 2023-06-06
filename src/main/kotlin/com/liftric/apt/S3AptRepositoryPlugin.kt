@@ -35,7 +35,6 @@ class S3AptRepositoryPlugin : Plugin<Project> {
             task.bucket.set(extension.bucket)
             task.bucketPath.set(extension.bucketPath.convention(""))
             task.region.set(extension.region)
-            task.override.set(extension.override)
             task.debianFiles.set(extension.debianFiles)
             task.signingKeyRingFile.set(extension.signingKeyRingFile)
             task.signingKeyPassphrase.set(extension.signingKeyPassphrase)
@@ -49,8 +48,8 @@ class S3AptRepositoryPlugin : Plugin<Project> {
             task.bucket.set(extension.bucket)
             task.bucketPath.set(extension.bucketPath.convention(""))
             task.region.set(extension.region)
-            task.signingKeyRingFile.set(extension.signingKeyRingFile)
-            task.signingKeyPassphrase.set(extension.signingKeyPassphrase)
+            task.suite.set(extension.suite.convention("stable"))
+            task.component.set(extension.component.convention("main"))
         }
     }
 }
