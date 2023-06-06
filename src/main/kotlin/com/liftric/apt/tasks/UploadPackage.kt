@@ -42,6 +42,22 @@ abstract class UploadPackageTask : DefaultTask() {
     @get:Optional
     abstract val signingKeyPassphrase: Property<String>
 
+    @get:Input
+    @get:Optional
+    abstract val origin: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val label: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val suite: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val component: Property<String>
+
     @TaskAction
     fun main() {
         val debianFilesValues = debianFiles.get()
@@ -50,6 +66,10 @@ abstract class UploadPackageTask : DefaultTask() {
         val regionValue = region.get()
         val bucketValue = bucket.get()
         val bucketPathValue = bucketPath.get()
+        val originValue = origin.orNull
+        val labelValue = label.orNull
+        val suiteValue = suite.orNull
+        val componentValue = component.orNull
 
         debianFilesValues.forEach { debianFile ->
             val inputFile = debianFile.file.get().asFile
@@ -59,10 +79,10 @@ abstract class UploadPackageTask : DefaultTask() {
             val region = debianFile.region.orNull ?: regionValue
             val bucket = debianFile.bucket.orNull ?: bucketValue
             val bucketPath = debianFile.bucketPath.orNull ?: bucketPathValue
-            val suite = debianFile.suite.orNull ?: DEFAULT_SUITE
-            val component = debianFile.component.orNull ?: DEFAULT_COMPONENT
-            val origin = debianFile.origin.orNull
-            val label = debianFile.label.orNull
+            val suite = debianFile.suite.orNull ?: suiteValue ?: DEFAULT_SUITE
+            val component = debianFile.component.orNull ?: componentValue ?: DEFAULT_COMPONENT
+            val origin = debianFile.origin.orNull ?: originValue
+            val label = debianFile.label.orNull ?: labelValue
             val packageName = debianFile.packageName.orNull
             val packageVersion = debianFile.packageVersion.orNull
             val signingKeyRingFileValue = signingKeyRingFile.orNull?.asFile

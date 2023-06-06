@@ -27,10 +27,25 @@ abstract class PluginExtension(val project: Project) {
     abstract val signingKeyRingFile: RegularFileProperty
     abstract val signingKeyPassphrase: Property<String>
 
-    /** Used for cleanPackages Task, Default: stable */
+    /** Set the APT Repository Origin, Default: Debian */
+    abstract val origin: Property<String>
+
+    /** Set the APT Repository Label, Default: Debian */
+    abstract val label: Property<String>
+
+    /**
+     *  The suite field may describe the suite. A suite is a single word.
+     *  In Debian, this shall be one of oldstable, stable, testing, unstable, or experimental.
+     *  Default: stable
+     */
     abstract val suite: Property<String>
 
-    /** Used for cleanPackages Task, Default: main */
+    /**
+     * The component property represents the component of an APT repository. In APT repositories, components
+     * categorize software packages based on their source or licensing. Commonly used components are "main",
+     * "contrib", and "non-free".
+     *  Default: main
+     */
     abstract val component: Property<String>
 }
 

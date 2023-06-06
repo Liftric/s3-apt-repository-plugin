@@ -25,6 +25,10 @@ class S3AptRepositoryPlugin : Plugin<Project> {
             task.debianFiles.set(extension.debianFiles)
             task.signingKeyRingFile.set(extension.signingKeyRingFile)
             task.signingKeyPassphrase.set(extension.signingKeyPassphrase)
+            task.origin.set(extension.origin)
+            task.label.set(extension.label)
+            task.suite.set(extension.suite)
+            task.component.set(extension.component)
         }
 
         project.tasks.register("removePackage", RemovePackageTask::class.java) { task ->
@@ -38,6 +42,10 @@ class S3AptRepositoryPlugin : Plugin<Project> {
             task.debianFiles.set(extension.debianFiles)
             task.signingKeyRingFile.set(extension.signingKeyRingFile)
             task.signingKeyPassphrase.set(extension.signingKeyPassphrase)
+            task.origin.set(extension.origin)
+            task.label.set(extension.label)
+            task.suite.set(extension.suite)
+            task.component.set(extension.component)
         }
 
         project.tasks.register("cleanPackages", CleanPackagesTask::class.java) { task ->
