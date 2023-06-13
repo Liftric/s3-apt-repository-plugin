@@ -235,9 +235,17 @@ fun getCleanPackagesFiles(
     archList.forEach { arch ->
         val relativePackagesFileLocation = "dists/$suite/$component/binary-$arch/Packages"
         val packagesFileLocation = getFullBucketKey(bucketPath, relativePackagesFileLocation)
-
         packagesInfo.architecture = arch
-        val packagesFile = getCleanPackagesFile(logger, arch, s3Client, bucket, packagesInfo, packagesFileLocation)
+
+        val packagesFile = try {
+            val packagesFile = s3Client.getObject(bucket, packagesFileLocation)
+            logger.info("Parsing Packages file: s3://$bucket/${packagesFileLocation}")
+            removeDebianFromPackagesFile(packagesFile, packagesInfo)
+        } catch (e: Exception) {
+            logger.error("Packages file for Architecture '$arch' not found! Can't remove '${packagesInfo.packageInfo}'")
+            throw e
+        }
+
         val gzipPackagesFile = packagesFile.compressWithGzip()
 
         packagesFiles[packagesFileLocation] = packagesFile
@@ -296,24 +304,6 @@ private fun parsePackagesFile(file: File, packagesInfo: PackagesInfo): File {
         deleteOnExit()
     }
     return packagesFileTemp
-}
-
-private fun getCleanPackagesFile(
-    logger: Logger,
-    arch: String,
-    s3Client: AwsS3Client,
-    bucket: String,
-    packagesInfo: PackagesInfo,
-    packagesFileLocation: String,
-): File {
-    return try {
-        val packagesFile = s3Client.getObject(bucket, packagesFileLocation)
-        logger.info("Parsing Packages file: s3://$bucket/${packagesFileLocation}")
-        removeDebianFromPackagesFile(packagesFile, packagesInfo)
-    } catch (e: Exception) {
-        logger.error("Packages file for ${packagesInfo.packageInfo}-$arch not found, nothing to clean")
-        throw e
-    }
 }
 
 private fun removeDebianFromPackagesFile(file: File, packagesInfo: PackagesInfo): File {

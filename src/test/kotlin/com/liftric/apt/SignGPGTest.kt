@@ -45,6 +45,7 @@ class ReleaseFileSigningTest {
         assertFalse(isValid, "Signature should not be valid")
     }
 
+    //Just for Internal Use, to verify the result of the signing process
     private fun verifySignedFile(signedFile: File, publicKeyFile: File, releaseFile: File): Boolean {
         val pubIn = PGPUtil.getDecoderStream(FileInputStream(publicKeyFile))
         val pgpPubRingCollection = JcaPGPPublicKeyRingCollection(pubIn)
@@ -62,5 +63,4 @@ class ReleaseFileSigningTest {
 
         return signature.verify()
     }
-
 }
