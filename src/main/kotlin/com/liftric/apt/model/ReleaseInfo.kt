@@ -37,7 +37,6 @@ data class ReleaseInfo(
     var date: String? = null,
     var description: String? = null,
     var version: String? = null,
-    var noSupportForArchitectureAll: String? = null,
     var validUntil: String? = null,
     var notAutomatic: String? = null,
     var butAutomaticUpgrades: String? = null,
@@ -85,7 +84,6 @@ fun ReleaseInfo.toFileString(): String {
         architectures?.let { appendLine("Architectures: $it") }
         description?.let { appendLine("Description: $it") }
         version?.let { appendLine("Version: $it") }
-        noSupportForArchitectureAll?.let { appendLine("NotAutomatic: $it") }
         validUntil?.let { appendLine("ValidUntil: $it") }
         notAutomatic?.let { appendLine("NotAutomatic: $it") }
         butAutomaticUpgrades?.let { appendLine("ButAutomaticUpgrades: $it") }
@@ -133,9 +131,6 @@ fun parseReleaseFile(file: File): ReleaseInfo {
             line.startsWith("Components:") -> releaseInfo.components = line.removePrefix("Components:").trim()
             line.startsWith("Description:") -> releaseInfo.description = line.removePrefix("Description:").trim()
             line.startsWith("Version:") -> releaseInfo.version = line.removePrefix("Version:").trim()
-            line.startsWith("NotAutomatic:") -> releaseInfo.noSupportForArchitectureAll =
-                line.removePrefix("NotAutomatic:").trim()
-
             line.startsWith("ValidUntil:") -> releaseInfo.validUntil = line.removePrefix("ValidUntil:").trim()
             line.startsWith("NotAutomatic:") -> releaseInfo.notAutomatic = line.removePrefix("NotAutomatic:").trim()
             line.startsWith("ButAutomaticUpgrades:") -> releaseInfo.butAutomaticUpgrades =

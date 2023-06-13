@@ -16,6 +16,7 @@ abstract class PluginExtension(val project: Project) {
     abstract val bucket: Property<String>
     abstract val bucketPath: Property<String>
     abstract val region: Property<String>
+    abstract val endpoint: Property<String>
 
     /** Override Versions that already exist in Apt Repository, Default is true */
     abstract val override: Property<Boolean>

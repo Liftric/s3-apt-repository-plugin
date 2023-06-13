@@ -11,7 +11,14 @@ import org.gradle.api.tasks.*
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Optional
 
+/**
+ * Removes a Package from the Packages file List inside an S3 Apt Repository
+ */
+
 abstract class RemovePackageTask : DefaultTask() {
+    @get:Nested
+    abstract val debianFiles: ListProperty<PackageBuilder>
+
     @get:Input
     abstract val accessKey: Property<String>
 
@@ -19,16 +26,17 @@ abstract class RemovePackageTask : DefaultTask() {
     abstract val secretKey: Property<String>
 
     @get:Input
-    abstract val region: Property<String>
-
-    @get:Input
     abstract val bucket: Property<String>
 
     @get:Input
     abstract val bucketPath: Property<String>
 
-    @get:Nested
-    abstract val debianFiles: ListProperty<PackageBuilder>
+    @get:Input
+    abstract val region: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val endpoint: Property<String>
 
     @get:Input
     @get:Optional
@@ -59,9 +67,10 @@ abstract class RemovePackageTask : DefaultTask() {
         val debianFilesValues = debianFiles.get()
         val accessKeyValue = accessKey.get()
         val secretKeyValue = secretKey.get()
-        val regionValue = region.get()
         val bucketValue = bucket.get()
         val bucketPathValue = bucketPath.get()
+        val regionValue = region.get()
+        val endpointValue = endpoint.orNull
         val originValue = origin.orNull
         val labelValue = label.orNull
         val suiteValue = suite.orNull
@@ -72,9 +81,10 @@ abstract class RemovePackageTask : DefaultTask() {
             val archs = debianFile.architectures.get()
             val accessKey = debianFile.accessKey.orNull ?: accessKeyValue
             val secretKey = debianFile.secretKey.orNull ?: secretKeyValue
-            val region = debianFile.region.orNull ?: regionValue
             val bucket = debianFile.bucket.orNull ?: bucketValue
             val bucketPath = debianFile.bucketPath.orNull ?: bucketPathValue
+            val region = debianFile.region.orNull ?: regionValue
+            val endpoint = debianFile.endpoint.orNull ?: endpointValue
             val suite = debianFile.suite.orNull ?: suiteValue ?: DEFAULT_SUITE
             val component = debianFile.component.orNull ?: componentValue ?: DEFAULT_COMPONENT
             val origin = debianFile.origin.orNull ?: originValue
@@ -84,7 +94,7 @@ abstract class RemovePackageTask : DefaultTask() {
             val signingKeyRingFileValue = signingKeyRingFile.orNull?.asFile
             val signingKeyPassphraseValue = signingKeyPassphrase.orNull
 
-            val s3Client = AwsS3Client(accessKey, secretKey, region)
+            val s3Client = AwsS3Client(accessKey, secretKey, region, endpoint)
 
             val packagesInfo = PackagesInfoFactory(inputFile)
             packagesInfo.packagesInfo.packageInfo = packageName ?: packagesInfo.packagesInfo.packageInfo

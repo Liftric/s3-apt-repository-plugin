@@ -15,6 +15,14 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+/**
+ * This file contains several utility functions for managing and interacting
+ * with an APT (Advanced Package Tool) repository that's hosted on an Amazon S3 bucket.
+ * It provides capabilities for operations like uploading, cleaning, updating, and
+ * maintaining packages in the repository.
+ */
+
+
 fun uploadDebianFile(
     logger: Logger,
     s3Client: AwsS3Client,
@@ -41,11 +49,18 @@ fun getPoolBucketKey(fileName: String, component: String): String {
     return "pool/$component/$firstLetter/$packageName/$fileName"
 }
 
-fun cleanPackages(logger: Logger, s3Client: AwsS3Client, bucket: String, bucketPath: String, suite: String, component: String) {
+fun cleanPackages(
+    logger: Logger,
+    s3Client: AwsS3Client,
+    bucket: String,
+    bucketPath: String,
+    suite: String,
+    component: String,
+) {
     val usedPackages: Set<String> = getUsedPackagesPoolKeys(s3Client, bucket, bucketPath, suite, component)
     val files: List<String> = s3Client.listAllObjects(bucket, getFullBucketKey(bucketPath, "pool/$component/"))
     val filesToRemove = files.filter { !usedPackages.contains(it) }
-    if(filesToRemove.isEmpty()) {
+    if (filesToRemove.isEmpty()) {
         logger.info("No files to remove")
         return
     }
@@ -316,9 +331,12 @@ private fun removeDebianFromPackagesFile(file: File, packagesInfo: PackagesInfo)
     val sb = StringBuilder()
 
     packagesInfoList.forEach { packageInfo ->
-        if (packageInfo.packageInfo != packagesInfo.packageInfo && packageInfo.version != packagesInfo.version) {
+        if (packageInfo.packageInfo != packagesInfo.packageInfo) {
+            sb.append(packageInfo.toFileString())
+        } else if (packageInfo.version != packagesInfo.version) {
             sb.append(packageInfo.toFileString())
         }
+
     }
     val packagesFileContent = sb.toString()
     val packagesFileTemp = File.createTempFile("packages", null).apply {

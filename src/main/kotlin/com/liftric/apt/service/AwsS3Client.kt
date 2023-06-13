@@ -7,6 +7,7 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.services.s3.model.*
 import java.io.File
+import java.net.URI
 
 /**
  * The AwsS3Client class is a utility for interacting with AWS S3 service.
@@ -29,19 +30,28 @@ class AwsS3Client(
     accessKey: String,
     secretKey: String,
     region: String,
+    endpoint: String? = null,
 ) {
-
-    private val s3Client = S3Client.builder()
-        .region(convertToRegion(region))
-        .credentialsProvider(
-            StaticCredentialsProvider.create(
-                AwsBasicCredentials.create(
-                    accessKey,
-                    secretKey
+    private val s3Client by lazy {
+        with(S3Client.builder()) {
+            when {
+                endpoint != null -> {
+                    val endpoint = URI.create(endpoint)
+                    endpointOverride(endpoint)
+                }
+            }
+            region(convertToRegion(region))
+            credentialsProvider(
+                StaticCredentialsProvider.create(
+                    AwsBasicCredentials.create(
+                        accessKey,
+                        secretKey
+                    )
                 )
             )
-        )
-        .build()
+            build()
+        }
+    }
 
     private fun convertToRegion(regionStr: String): Region {
         return Region.of(regionStr)

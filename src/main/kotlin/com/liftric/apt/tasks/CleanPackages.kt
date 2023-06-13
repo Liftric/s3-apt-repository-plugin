@@ -6,13 +6,11 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
 import org.gradle.api.provider.Property
 
+/**
+ * Delete all Packages from pool that are not referenced in the Packages file
+ */
+
 abstract class CleanPackagesTask : DefaultTask() {
-    @get:Input
-    abstract val accessKey: Property<String>
-
-    @get:Input
-    abstract val secretKey: Property<String>
-
     @get:Input
     abstract val suite: Property<String>
 
@@ -20,7 +18,10 @@ abstract class CleanPackagesTask : DefaultTask() {
     abstract val component: Property<String>
 
     @get:Input
-    abstract val region: Property<String>
+    abstract val accessKey: Property<String>
+
+    @get:Input
+    abstract val secretKey: Property<String>
 
     @get:Input
     abstract val bucket: Property<String>
@@ -28,17 +29,25 @@ abstract class CleanPackagesTask : DefaultTask() {
     @get:Input
     abstract val bucketPath: Property<String>
 
+    @get:Input
+    abstract val region: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val endpoint: Property<String>
+
     @TaskAction
     fun main() {
-        val accessKeyValue = accessKey.get()
-        val secretKeyValue = secretKey.get()
-        val regionValue = region.get()
-        val bucketValue = bucket.get()
-        val bucketPathValue = bucketPath.get()
         val suiteValue = suite.get()
         val componentValue = component.get()
+        val accessKeyValue = accessKey.get()
+        val secretKeyValue = secretKey.get()
+        val bucketValue = bucket.get()
+        val bucketPathValue = bucketPath.get()
+        val regionValue = region.get()
+        val endpointValue = endpoint.orNull
 
-        val s3Client = AwsS3Client(accessKeyValue, secretKeyValue, regionValue)
+        val s3Client = AwsS3Client(accessKeyValue, secretKeyValue, regionValue, endpointValue)
         cleanPackages(logger, s3Client, bucketValue, bucketPathValue, suiteValue, componentValue)
     }
 }

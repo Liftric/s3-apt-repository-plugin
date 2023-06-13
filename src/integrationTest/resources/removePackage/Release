@@ -1,0 +1,18 @@
+Origin: Liftric
+Label: Liftric
+Suite: stable
+Components: main
+Date: Fri, 09 Jun 2023 13:49:36 UTC
+Architectures: all
+MD5Sum:
+ aaa89313abd9c03f2081cdfc1e6ec305 775 main/binary-all/Packages
+ 0370184af6f72ae92312afdc05f65758 414 main/binary-all/Packages.gz
+SHA1:
+ b74c20751e3aa9db4fba802bd4b796742b6538cf 775 main/binary-all/Packages
+ 90c7eb2a32dbcfea8862a4c457701d1402aa0243 414 main/binary-all/Packages.gz
+SHA256:
+ 652af4c74358bbbf11997c9b563c1b1398f20f2a645c26726c0cdbc3aeb0bcaf 775 main/binary-all/Packages
+ e3fb6eb6df307252d344dcb8ed4cdb4a47ff2b58768cd99ecdb8dd4b886f3201 414 main/binary-all/Packages.gz
+SHA512:
+ 104143ee92f1f973c7c2275b9e02550c73aa2ea396ba9b04b80101c89aa2cfeaaecc226d169c370f37ced4a9a1361c6edf971bb02b76425a1d6c1a0dbed15993 775 main/binary-all/Packages
+ 677ab9ca7ec4dd7830b80b55681be6128b3f9a861d8a95b925d14b3b33d182e3c8d55b1c622c039a8949d953899507b94320d201acc8e0feab372034c413fcb7 414 main/binary-all/Packages.gz

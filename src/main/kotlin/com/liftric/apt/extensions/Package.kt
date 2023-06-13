@@ -20,6 +20,8 @@ data class Package(
     val bucketPath: String?,
     /** Optional: Used for override the default region */
     val region: String?,
+    /** Optional: Used for override the default S3 endpoint */
+    val endpoint: String?,
     /** Optional: Used for override the default accessKey */
     val accessKey: String?,
     /** Optional: Used for override the default secretKey */
@@ -61,6 +63,10 @@ class PackageBuilder(@get:Internal val project: Project) {
 
     @get:Input
     @get:Optional
+    val endpoint: Property<String?> = project.objects.property(String::class.java)
+
+    @get:Input
+    @get:Optional
     val accessKey: Property<String?> = project.objects.property(String::class.java)
 
     @get:Input
@@ -97,6 +103,7 @@ class PackageBuilder(@get:Internal val project: Project) {
         bucket = bucket.orNull,
         bucketPath = bucketPath.orNull,
         region = region.orNull,
+        endpoint = endpoint.orNull,
         accessKey = accessKey.orNull,
         secretKey = secretKey.orNull,
         suite = suite.orNull,

@@ -12,7 +12,14 @@ repositories {
     gradlePluginPortal()
 }
 
-val integrationTest = sourceSets.create("integrationTest")
+sourceSets {
+    val main by getting
+    val integrationTest by creating {
+        compileClasspath += main.output
+        runtimeClasspath += main.output
+    }
+}
+
 tasks {
     val test by existing
     withType<Test> {
@@ -23,6 +30,7 @@ tasks {
         systemProperty("org.gradle.testkit.dir", gradle.gradleUserHomeDir)
     }
 
+    val integrationTest by sourceSets
     val integrationTestTask = register<Test>("integrationTest") {
         description = "Runs the integration tests"
         group = "verification"
@@ -35,6 +43,7 @@ tasks {
 
 
 gradlePlugin {
+    val integrationTest by sourceSets
     testSourceSets(integrationTest)
     plugins {
         create("s3-apt-repository-plugin") {
@@ -46,6 +55,7 @@ gradlePlugin {
         }
     }
 }
+
 pluginBundle {
     website = "https://github.com/Liftric/s3-apt-repository-plugin"
     vcsUrl = "https://github.com/Liftric/s3-apt-repository-plugin"
@@ -53,17 +63,19 @@ pluginBundle {
     tags = listOf("s3", "apt", "repository", "plugin", "gradle")
 }
 
-
 dependencies {
     implementation(libs.kotlinStdlibJdk8)
-    implementation("org.apache.commons", "commons-compress", "1.21")
-    implementation("com.github.luben:zstd-jni:1.5.5-3")
-    implementation("org.bouncycastle:bcpg-jdk15on:1.70")
-    implementation("org.bouncycastle:bcprov-jdk15on:1.70")
+    implementation(libs.apacheCommons)
+    implementation(libs.xz)
+    implementation(libs.bouncyCastleGPG)
+    implementation(libs.bouncyCastleProvider)
     implementation(libs.awsS3)
 
     testImplementation(libs.junitJupiter)
 
     "integrationTestImplementation"(gradleTestKit())
     "integrationTestImplementation"(libs.junitJupiter)
+    "integrationTestImplementation"(libs.testContainersJUnit5)
+    "integrationTestImplementation"(libs.testContainersMain)
+    "integrationTestImplementation"("io.minio:minio:8.5.3")
 }

@@ -17,6 +17,20 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.security.Security
 
+/**
+ * Signs the Release file of an Apt Repository using a given private key.
+ * This function first ensures the Bouncy Castle security provider is added, then loads the private key,
+ * and sets up a signature generator with the proper signing algorithm.
+ * It reads the Release file into a byte array, which is then used to update the signature generator.
+ * After generating the signature, it writes the signature into a temporary file which will be deleted when the program ends.
+ *
+ * @param privateKeyFile File object representing the private key file
+ * @param passphrase CharArray object representing the passphrase to the private key file
+ * @param releaseFile File object representing the Release file to be signed
+ * @return File object representing the signed Release file
+ */
+
+
 fun signReleaseFile(privateKeyFile: File, passphrase: CharArray, releaseFile: File): File {
     if (Security.getProvider("BC") == null) {
         Security.addProvider(BouncyCastleProvider());
@@ -30,7 +44,10 @@ fun signReleaseFile(privateKeyFile: File, passphrase: CharArray, releaseFile: Fi
     val fileBytes = releaseFile.readBytes()
     sigGen.update(fileBytes)
 
-    val signedFile = File("Release.gpg")
+    val signedFile = File.createTempFile("Release", ".gpg").apply {
+        deleteOnExit()
+    }
+
     val fileOutputStream = FileOutputStream(signedFile)
     val armoredOutputStream = ArmoredOutputStream(fileOutputStream)
 
