@@ -48,6 +48,8 @@ abstract class CleanPackagesTask : DefaultTask() {
         val endpointValue = endpoint.orNull
 
         val s3Client = AwsS3Client(accessKeyValue, secretKeyValue, regionValue, endpointValue)
-        cleanPackages(logger, s3Client, bucketValue, bucketPathValue, suiteValue, componentValue)
+
+        val usedPackages = getUsedPackagesPoolKeys(s3Client, bucketValue, bucketPathValue, suiteValue, componentValue)
+        cleanPackages(logger, s3Client, bucketValue, bucketPathValue, componentValue, usedPackages)
     }
 }

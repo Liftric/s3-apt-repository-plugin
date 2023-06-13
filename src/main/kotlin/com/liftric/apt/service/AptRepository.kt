@@ -54,10 +54,9 @@ fun cleanPackages(
     s3Client: AwsS3Client,
     bucket: String,
     bucketPath: String,
-    suite: String,
     component: String,
+    usedPackages: Set<String>,
 ) {
-    val usedPackages: Set<String> = getUsedPackagesPoolKeys(s3Client, bucket, bucketPath, suite, component)
     val files: List<String> = s3Client.listAllObjects(bucket, getFullBucketKey(bucketPath, "pool/$component/"))
     val filesToRemove = files.filter { !usedPackages.contains(it) }
     if (filesToRemove.isEmpty()) {
@@ -68,7 +67,7 @@ fun cleanPackages(
     logger.info("Deleted ${deletedObjects.deleted().size} objects")
 }
 
-private fun getUsedPackagesPoolKeys(
+fun getUsedPackagesPoolKeys(
     s3Client: AwsS3Client,
     bucket: String,
     bucketPath: String,
@@ -193,12 +192,26 @@ fun updatePackagesFiles(
     packagesInfo: PackagesInfo,
 ): Map<String, File> {
     val packagesFiles = mutableMapOf<String, File>()
+
     archList.forEach { arch ->
         val relativePackagesFileLocation = "dists/$suite/$component/binary-$arch/Packages"
         val packagesFileLocation = getFullBucketKey(bucketPath, relativePackagesFileLocation)
-
         packagesInfo.architecture = arch
-        val packagesFile = getUploadPackagesFile(logger, arch, s3Client, bucket, packagesInfo, packagesFileLocation)
+
+        val packagesFile = try {
+            val packagesFile = s3Client.getObject(bucket, packagesFileLocation)
+            logger.info("Parsing Packages file: s3://$bucket/${packagesFileLocation}")
+            parsePackagesFile(packagesFile, packagesInfo)
+        } catch (e: Exception) {
+            logger.info("Packages file for '$arch' not found, creating new Packages file")
+            val packagesString = packagesInfo.toFileString()
+            val packagesFile = File.createTempFile(packagesFileLocation, null).apply {
+                writeText(packagesString)
+                deleteOnExit()
+            }
+            packagesFile
+        }
+
         val gzipPackagesFile = packagesFile.compressWithGzip()
 
         packagesFiles[packagesFileLocation] = packagesFile
@@ -256,29 +269,6 @@ private fun getFullBucketKey(bucketPath: String, bucketKey: String): String {
         bucketKey
     } else {
         "$bucketPath/$bucketKey"
-    }
-}
-
-private fun getUploadPackagesFile(
-    logger: Logger,
-    arch: String,
-    s3Client: AwsS3Client,
-    bucket: String,
-    packagesInfo: PackagesInfo,
-    packagesFileLocation: String,
-): File {
-    return try {
-        val packagesFile = s3Client.getObject(bucket, packagesFileLocation)
-        logger.info("Parsing Packages file: s3://$bucket/${packagesFileLocation}")
-        parsePackagesFile(packagesFile, packagesInfo)
-    } catch (e: Exception) {
-        logger.info("Packages file for '$arch' not found, creating new Packages file")
-        val packagesString = packagesInfo.toFileString()
-        val packagesFile = File.createTempFile(packagesFileLocation, null).apply {
-            writeText(packagesString)
-            deleteOnExit()
-        }
-        packagesFile
     }
 }
 
