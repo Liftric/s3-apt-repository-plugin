@@ -25,6 +25,7 @@ pluginManagement {
                 library("apacheCommons", "org.apache.commons", "commons-compress").version("1.12")
                 library("testContainersJUnit5", "org.testcontainers", "junit-jupiter").version("1.18.3")
                 library("testContainersMain", "org.testcontainers", "testcontainers").version("1.18.3")
+                library("minio", "io.minio", "minio").version("8.5.3")
             }
         }
     }

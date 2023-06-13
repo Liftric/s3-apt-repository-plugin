@@ -77,5 +77,5 @@ dependencies {
     "integrationTestImplementation"(libs.junitJupiter)
     "integrationTestImplementation"(libs.testContainersJUnit5)
     "integrationTestImplementation"(libs.testContainersMain)
-    "integrationTestImplementation"("io.minio:minio:8.5.3")
+    "integrationTestImplementation"(libs.minio)
 }
