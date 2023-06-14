@@ -15,6 +15,7 @@ pluginManagement {
                 plugin("kotlinJvm", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
                 plugin("kotlinSerialization", "org.jetbrains.kotlin.plugin.serialization").versionRef("kotlin")
                 plugin("gradlePluginPublish", "com.gradle.plugin-publish").version("1.2.0")
+                plugin("nemerosaVersioning", "net.nemerosa.versioning").version("3.0.0")
 
                 library("kotlinStdlibJdk8", "org.jetbrains.kotlin", "kotlin-stdlib-jdk8").versionRef("kotlin")
                 library("junitBom", "org.junit", "junit-bom").versionRef("junit-bom")

@@ -44,24 +44,24 @@ class CleanPackageTest : AbstractContainerBaseTest() {
     fun testCleanPackageTask() {
         uploadObjects(
             CLEAN_PACKAGES_TEST_BUCKET, mapOf(
-                "src/integrationTest/resources/cleanPackages/Release" to "dists/stable/Release",
-                "src/integrationTest/resources/cleanPackages/Release.gpg" to "dists/stable/Release.gpg",
-                "src/integrationTest/resources/cleanPackages/Packages" to "dists/stable/main/binary-all/Packages",
-                "src/integrationTest/resources/cleanPackages/Packages.gz" to "dists/stable/main/binary-all/Packages.gz",
-                "src/integrationTest/resources/cleanPackages/foobar_1.0.0-1_all.deb" to "pool/main/f/foobar/foobar_1.0.0-1_all.deb",
-                "src/integrationTest/resources/cleanPackages/foobar_0.0.9-1_all.deb" to "pool/main/f/foobar/foobar_0.0.9-1_all.deb",
+                "src/integrationMain/resources/cleanPackages/Release" to "dists/stable/Release",
+                "src/integrationMain/resources/cleanPackages/Release.gpg" to "dists/stable/Release.gpg",
+                "src/integrationMain/resources/cleanPackages/Packages" to "dists/stable/main/binary-all/Packages",
+                "src/integrationMain/resources/cleanPackages/Packages.gz" to "dists/stable/main/binary-all/Packages.gz",
+                "src/integrationMain/resources/cleanPackages/foobar_1.0.0-1_all.deb" to "pool/main/f/foobar/foobar_1.0.0-1_all.deb",
+                "src/integrationMain/resources/cleanPackages/foobar_0.0.9-1_all.deb" to "pool/main/f/foobar/foobar_0.0.9-1_all.deb",
             )
         )
 
         val projectDir = File(CLEAN_PACKAGES_TEST_LOCATION)
         projectDir.mkdirs()
         Files.copy(
-            Paths.get("src/integrationTest/resources/$PRIVATE_KEY_FILE"),
+            Paths.get("src/integrationMain/resources/$PRIVATE_KEY_FILE"),
             projectDir.toPath().resolve(PRIVATE_KEY_FILE),
             StandardCopyOption.REPLACE_EXISTING
         )
         Files.copy(
-            Paths.get("src/integrationTest/resources/$PUBLIC_KEY_FILE"),
+            Paths.get("src/integrationMain/resources/$PUBLIC_KEY_FILE"),
             projectDir.toPath().resolve(PUBLIC_KEY_FILE),
             StandardCopyOption.REPLACE_EXISTING
         )

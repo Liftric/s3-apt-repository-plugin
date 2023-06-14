@@ -41,12 +41,12 @@ class UploadPackageTest2 : AbstractContainerBaseTest() {
         val projectDir = File(UPLOAD_PACKAGE_TEST_LOCATION_2)
         projectDir.mkdirs()
         Files.copy(
-            Paths.get("src/integrationTest/resources/$PRIVATE_KEY_FILE"),
+            Paths.get("src/integrationMain/resources/$PRIVATE_KEY_FILE"),
             projectDir.toPath().resolve(PRIVATE_KEY_FILE),
             StandardCopyOption.REPLACE_EXISTING
         )
         Files.copy(
-            Paths.get("src/integrationTest/resources/$PUBLIC_KEY_FILE"),
+            Paths.get("src/integrationMain/resources/$PUBLIC_KEY_FILE"),
             projectDir.toPath().resolve(PUBLIC_KEY_FILE),
             StandardCopyOption.REPLACE_EXISTING
         )
