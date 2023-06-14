@@ -100,11 +100,10 @@ abstract class UploadPackageTask : DefaultTask() {
 
             val s3Client = AwsS3Client(accessKey, secretKey, region, endpoint)
 
-            val packagesInfo = PackagesInfoFactory(inputFile)
             val debianPoolBucketKey = getPoolBucketKey(inputFile.name, component)
-            packagesInfo.packagesInfo.fileName = debianPoolBucketKey
-            packagesInfo.packagesInfo.packageInfo = packageName ?: packagesInfo.packagesInfo.packageInfo
-            packagesInfo.packagesInfo.version = packageVersion ?: packagesInfo.packagesInfo.version
+
+            val debianPackages =
+                PackagesFactory.parseDebianFile(inputFile, archs, debianPoolBucketKey, packageName, packageVersion)
 
             uploadDebianFile(
                 logger,
@@ -117,16 +116,7 @@ abstract class UploadPackageTask : DefaultTask() {
             )
 
             val packagesFiles =
-                updatePackagesFiles(
-                    logger,
-                    archs,
-                    suite,
-                    component,
-                    s3Client,
-                    bucket,
-                    bucketPath,
-                    packagesInfo.packagesInfo
-                )
+                getUpdatedPackagesFiles(logger, suite, component, s3Client, bucket, bucketPath, debianPackages)
 
             uploadPackagesFiles(logger, packagesFiles, s3Client, bucket)
 

@@ -28,7 +28,7 @@ class GetUsedPackagesPoolKeysTest {
 
         val tempFile = createTempFile()
         tempFile.toFile()
-            .writeText("Package: foobar\nVersion: 1.0.0-1\nFilename: pool/main/f/foobar/foobar_1.0.0-1_all.deb\n")
+            .writeText("Package: foobar\nVersion: 1.0.0-1\nArchitecture: all\nSize: 123\nFilename: pool/main/f/foobar/foobar_1.0.0-1_all.deb\n")
 
         `when`(mockS3Client.getObject(anyString(), anyString())).thenReturn(tempFile.toFile())
 

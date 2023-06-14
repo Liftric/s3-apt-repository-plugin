@@ -96,20 +96,18 @@ abstract class RemovePackageTask : DefaultTask() {
 
             val s3Client = AwsS3Client(accessKey, secretKey, region, endpoint)
 
-            val packagesInfo = PackagesInfoFactory(inputFile)
-            packagesInfo.packagesInfo.packageInfo = packageName ?: packagesInfo.packagesInfo.packageInfo
-            packagesInfo.packagesInfo.version = packageVersion ?: packagesInfo.packagesInfo.version
+            val debianPackages =
+                PackagesFactory.parseDebianFile(inputFile, archs, "", packageName, packageVersion)
 
             val packagesFiles =
-                getCleanPackagesFiles(
+                getCleanedPackagesFiles(
                     logger,
-                    archs,
                     suite,
                     component,
                     s3Client,
                     bucket,
                     bucketPath,
-                    packagesInfo.packagesInfo
+                    debianPackages
                 )
 
             uploadPackagesFiles(logger, packagesFiles, s3Client, bucket)

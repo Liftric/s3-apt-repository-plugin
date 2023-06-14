@@ -6,7 +6,6 @@ import com.liftric.apt.utils.FileHashUtil.md5Hash
 import com.liftric.apt.utils.FileHashUtil.sha1Hash
 import com.liftric.apt.utils.FileHashUtil.sha256Hash
 import com.liftric.apt.utils.FileHashUtil.sha512Hash
-import com.liftric.apt.utils.FileHashUtil.size
 import com.liftric.apt.utils.signReleaseFile
 import org.gradle.api.logging.Logger
 import java.io.File
@@ -74,19 +73,14 @@ fun getUsedPackagesPoolKeys(
     suite: String,
     component: String,
 ): Set<String> {
-    val files = s3Client.listAllObjects(bucket, getFullBucketKey(bucketPath, "dists/$suite/$component/binary-"))
-    val usedPackages = mutableSetOf<String>()
-    for (filePath in files) {
-        if (filePath.endsWith("Packages")) {
-            val file = s3Client.getObject(bucket, filePath)
-            val packagesInfo = readPackagesFile(file)
-
-            for (packageInfo in packagesInfo) {
-                packageInfo.fileName?.let { usedPackages.add(getFullBucketKey(bucketPath, it)) }
-            }
+    val fileKeys = s3Client.listAllObjects(bucket, getFullBucketKey(bucketPath, "dists/$suite/$component/binary-"))
+    return fileKeys.filter { key -> key.endsWith("Packages") }
+        .map { key -> s3Client.getObject(bucket, key) }
+        .flatMap { file ->
+            PackagesFactory.parsePackagesFile(file)
         }
-    }
-    return usedPackages
+        .map { packagesInfo -> getFullBucketKey(bucketPath, packagesInfo.fileName) }
+        .toSet()
 }
 
 fun updateReleaseFiles(
@@ -122,28 +116,28 @@ fun updateReleaseFiles(
 
         val md5Sum = MD5Sum(
             packageFile.md5Hash(),
-            packageFile.size(),
+            packageFile.length(),
             relativeFilePath,
         )
         releaseInfo.md5Sum.add(md5Sum)
 
         val sha1 = SHA1(
             packageFile.sha1Hash(),
-            packageFile.size(),
+            packageFile.length(),
             relativeFilePath,
         )
         releaseInfo.sha1.add(sha1)
 
         val sha256 = SHA256(
             packageFile.sha256Hash(),
-            packageFile.size(),
+            packageFile.length(),
             relativeFilePath,
         )
         releaseInfo.sha256.add(sha256)
 
         val sha512 = SHA512(
             packageFile.sha512Hash(),
-            packageFile.size(),
+            packageFile.length(),
             relativeFilePath,
         )
         releaseInfo.sha512.add(sha512)
@@ -157,8 +151,7 @@ fun updateReleaseFiles(
     }
 
     if (signingKeyRingFile != null && signingKeyPassphrase != null) {
-        val signedReleaseFile =
-            signReleaseFile(signingKeyRingFile, signingKeyPassphrase.toCharArray(), releaseFile)
+        val signedReleaseFile = signReleaseFile(signingKeyRingFile, signingKeyPassphrase.toCharArray(), releaseFile)
         s3Client.uploadObject(bucket, "${releaseFileLocation}Release.gpg", signedReleaseFile)
         logger.info("Signed Release file uploaded to s3://$bucket/${releaseFileLocation}Release.gpg")
         s3Client.uploadObject(bucket, "${releaseFileLocation}Release", releaseFile)
@@ -181,37 +174,31 @@ fun uploadPackagesFiles(
     }
 }
 
-fun updatePackagesFiles(
+fun getUpdatedPackagesFiles(
     logger: Logger,
-    archList: Set<String>,
     suite: String,
     component: String,
     s3Client: AwsS3Client,
     bucket: String,
     bucketPath: String,
-    packagesInfo: PackagesInfo,
+    debianPackages: List<DebianPackage>,
 ): Map<String, File> {
     val packagesFiles = mutableMapOf<String, File>()
 
-    archList.forEach { arch ->
-        val relativePackagesFileLocation = "dists/$suite/$component/binary-$arch/Packages"
+    debianPackages.forEach { debianPackage ->
+        val relativePackagesFileLocation = "dists/$suite/$component/binary-${debianPackage.architecture}/Packages"
         val packagesFileLocation = getFullBucketKey(bucketPath, relativePackagesFileLocation)
-        packagesInfo.architecture = arch
 
         val packagesFile = try {
             val packagesFile = s3Client.getObject(bucket, packagesFileLocation)
             logger.info("Parsing Packages file: s3://$bucket/${packagesFileLocation}")
-            parsePackagesFile(packagesFile, packagesInfo)
+            val oldDebianPackages = PackagesFactory.parsePackagesFile(packagesFile)
+            val combinedPackages = oldDebianPackages.combineDebianPackages(debianPackage)
+            createTemporaryFile(combinedPackages.toFileString(), packagesFileLocation)
         } catch (e: Exception) {
-            logger.info("Packages file for '$arch' not found, creating new Packages file")
-            val packagesString = packagesInfo.toFileString()
-            val packagesFile = File.createTempFile(packagesFileLocation, null).apply {
-                writeText(packagesString)
-                deleteOnExit()
-            }
-            packagesFile
+            logger.info("Packages file for '${debianPackage.architecture}' not found, creating new Packages file")
+            createTemporaryFile(debianPackage.toFileString(), packagesFileLocation)
         }
-
         val gzipPackagesFile = packagesFile.compressWithGzip()
 
         packagesFiles[packagesFileLocation] = packagesFile
@@ -221,28 +208,28 @@ fun updatePackagesFiles(
     return packagesFiles
 }
 
-fun getCleanPackagesFiles(
+fun getCleanedPackagesFiles(
     logger: Logger,
-    archList: Set<String>,
     suite: String,
     component: String,
     s3Client: AwsS3Client,
     bucket: String,
     bucketPath: String,
-    packagesInfo: PackagesInfo,
+    debianPackages: List<DebianPackage>,
 ): Map<String, File> {
     val packagesFiles = mutableMapOf<String, File>()
-    archList.forEach { arch ->
-        val relativePackagesFileLocation = "dists/$suite/$component/binary-$arch/Packages"
+    debianPackages.forEach { debianPackage ->
+        val relativePackagesFileLocation = "dists/$suite/$component/binary-${debianPackage.architecture}/Packages"
         val packagesFileLocation = getFullBucketKey(bucketPath, relativePackagesFileLocation)
-        packagesInfo.architecture = arch
 
         val packagesFile = try {
             val packagesFile = s3Client.getObject(bucket, packagesFileLocation)
             logger.info("Parsing Packages file: s3://$bucket/${packagesFileLocation}")
-            removeDebianFromPackagesFile(packagesFile, packagesInfo)
+            val oldDebianPackages = PackagesFactory.parsePackagesFile(packagesFile)
+            val cleanedDebianPackages = oldDebianPackages.removeDebianPackage(debianPackage)
+            createTemporaryFile(cleanedDebianPackages.toFileString(), packagesFileLocation)
         } catch (e: Exception) {
-            logger.error("Packages file for Architecture '$arch' not found! Can't remove '${packagesInfo.packageInfo}'")
+            logger.error("Packages file for Architecture '${debianPackage.architecture}' not found! Can't remove '${debianPackage.packageName}'")
             throw e
         }
 
@@ -280,48 +267,9 @@ private fun getFullBucketKey(bucketPath: String, bucketKey: String): String {
     }
 }
 
-private fun parsePackagesFile(file: File, packagesInfo: PackagesInfo): File {
-    val packagesInfoList: List<PackagesInfo> = readPackagesFile(file)
-    val sb = StringBuilder()
-
-    var found = false
-    packagesInfoList.forEach { packageInfo ->
-        if (packageInfo.packageInfo == packagesInfo.packageInfo && packageInfo.version == packagesInfo.version) {
-            found = true
-            sb.append(packagesInfo.toFileString())
-        } else {
-            sb.append(packageInfo.toFileString())
-        }
-    }
-
-    if (!found) {
-        sb.append(packagesInfo.toFileString())
-    }
-
-    val packagesFileContent = sb.toString()
-    val packagesFileTemp = File.createTempFile("packages", null).apply {
-        writeText(packagesFileContent)
+private fun createTemporaryFile(content: String, fileName: String, prefix: String? = null): File {
+    return File.createTempFile(fileName, prefix).apply {
+        writeText(content)
         deleteOnExit()
     }
-    return packagesFileTemp
-}
-
-private fun removeDebianFromPackagesFile(file: File, packagesInfo: PackagesInfo): File {
-    val packagesInfoList: List<PackagesInfo> = readPackagesFile(file)
-    val sb = StringBuilder()
-
-    packagesInfoList.forEach { packageInfo ->
-        if (packageInfo.packageInfo != packagesInfo.packageInfo) {
-            sb.append(packageInfo.toFileString())
-        } else if (packageInfo.version != packagesInfo.version) {
-            sb.append(packageInfo.toFileString())
-        }
-
-    }
-    val packagesFileContent = sb.toString()
-    val packagesFileTemp = File.createTempFile("packages", null).apply {
-        writeText(packagesFileContent)
-        deleteOnExit()
-    }
-    return packagesFileTemp
 }

@@ -1,6 +1,6 @@
 package com.liftric.apt
 
-import com.liftric.apt.model.readPackagesFile
+import com.liftric.apt.service.PackagesFactory
 import io.minio.GetObjectArgs
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -163,10 +163,10 @@ s3AptRepository {
             outputStream.close()
             stream.close()
 
-            val packagesInfos = readPackagesFile(outputFile)
-            assertTrue(packagesInfos.size == 1)
-            assertTrue(packagesInfos[0].packageInfo == "foobar")
-            assertTrue(packagesInfos[0].version == "1.0.0-1")
+            val debianPackages = PackagesFactory.parsePackagesFile(outputFile)
+            assertTrue(debianPackages.size == 1)
+            assertTrue(debianPackages[0].packageName == "foobar")
+            assertTrue(debianPackages[0].version == "1.0.0-1")
         } catch (e: Exception) {
             fail("Unexpected exception: ${e.message}")
         }
