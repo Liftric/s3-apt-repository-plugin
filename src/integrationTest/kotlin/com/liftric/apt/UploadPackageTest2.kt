@@ -92,7 +92,7 @@ s3AptRepository {
     secretKey.set("$MINIO_SECRET_KEY")
     signingKeyPassphrase.set("$SIGNING_KEY_PASSPHRASE")
     signingKeyRingFile.set(file("$PRIVATE_KEY_FILE"))
-    debian {
+    debPackage {
         file.set(createDeb.archiveFile)
         architectures.set(setOf("all"))
         origin.set("Liftric")

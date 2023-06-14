@@ -42,7 +42,7 @@ data class Package(
 
 @Suppress("MemberVisibilityCanBePrivate")
 @ConfigDsl
-class PackageBuilder(@get:Internal val project: Project) {
+class DebPackageBuilder(@get:Internal val project: Project) {
     @get:Input
     val file: RegularFileProperty = project.objects.fileProperty()
 

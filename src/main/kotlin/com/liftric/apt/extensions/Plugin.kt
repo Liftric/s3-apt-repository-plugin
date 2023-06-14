@@ -5,7 +5,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 
-abstract class PluginExtension(val project: Project) {
+abstract class S3AptRepositoryPluginExtension(val project: Project) {
     /**
      * AWS Configuration
      * These properties can be individually overridden for each Debian file.
@@ -22,7 +22,7 @@ abstract class PluginExtension(val project: Project) {
     abstract val override: Property<Boolean>
 
     /** You can specify multiple Debian Files for different Architectures */
-    abstract val debianFiles: ListProperty<PackageBuilder>
+    abstract val debPackages: ListProperty<DebPackageBuilder>
 
     /** PGP Signing of Release File */
     abstract val signingKeyRingFile: RegularFileProperty
@@ -50,6 +50,6 @@ abstract class PluginExtension(val project: Project) {
     abstract val component: Property<String>
 }
 
-fun PluginExtension.debian(action: PackageBuilder.() -> Unit) {
-    debianFiles.add(PackageBuilder(project).apply(action))
+fun S3AptRepositoryPluginExtension.debPackage(action: DebPackageBuilder.() -> Unit) {
+    debPackages.add(DebPackageBuilder(project).apply(action))
 }

@@ -1,6 +1,6 @@
 package com.liftric.apt
 
-import com.liftric.apt.extensions.PluginExtension
+import com.liftric.apt.extensions.S3AptRepositoryPluginExtension
 import com.liftric.apt.tasks.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -19,7 +19,7 @@ internal const val taskGroup = "S3 Apt Repository Plugin"
 class S3AptRepositoryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val extension =
-            project.extensions.create(extensionName, PluginExtension::class.java, project)
+            project.extensions.create(extensionName, S3AptRepositoryPluginExtension::class.java, project)
 
         project.tasks.register("uploadPackage", UploadPackageTask::class.java) { task ->
             task.group = taskGroup
@@ -31,7 +31,7 @@ class S3AptRepositoryPlugin : Plugin<Project> {
             task.region.set(extension.region)
             task.endpoint.set(extension.endpoint)
             task.override.set(extension.override)
-            task.debianFiles.set(extension.debianFiles)
+            task.debianFiles.set(extension.debPackages)
             task.signingKeyRingFile.set(extension.signingKeyRingFile)
             task.signingKeyPassphrase.set(extension.signingKeyPassphrase)
             task.origin.set(extension.origin)
@@ -49,7 +49,7 @@ class S3AptRepositoryPlugin : Plugin<Project> {
             task.bucketPath.set(extension.bucketPath.convention(""))
             task.region.set(extension.region)
             task.endpoint.set(extension.endpoint)
-            task.debianFiles.set(extension.debianFiles)
+            task.debianFiles.set(extension.debPackages)
             task.signingKeyRingFile.set(extension.signingKeyRingFile)
             task.signingKeyPassphrase.set(extension.signingKeyPassphrase)
             task.origin.set(extension.origin)
@@ -73,7 +73,7 @@ class S3AptRepositoryPlugin : Plugin<Project> {
     }
 }
 
-fun Project.dependencyTrackCompanion(): PluginExtension {
-    return extensions.getByName(extensionName) as? PluginExtension
+fun Project.dependencyTrackCompanion(): S3AptRepositoryPluginExtension {
+    return extensions.getByName(extensionName) as? S3AptRepositoryPluginExtension
         ?: throw IllegalStateException("$extensionName is not of the correct type")
 }

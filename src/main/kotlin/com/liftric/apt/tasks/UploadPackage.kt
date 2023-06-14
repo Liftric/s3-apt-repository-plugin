@@ -1,7 +1,7 @@
 package com.liftric.apt.tasks
 
 import com.liftric.apt.service.AwsS3Client
-import com.liftric.apt.extensions.PackageBuilder
+import com.liftric.apt.extensions.DebPackageBuilder
 import com.liftric.apt.model.*
 import com.liftric.apt.service.*
 import org.gradle.api.DefaultTask
@@ -17,7 +17,7 @@ import org.gradle.api.tasks.Optional
 
 abstract class UploadPackageTask : DefaultTask() {
     @get:Nested
-    abstract val debianFiles: ListProperty<PackageBuilder>
+    abstract val debianFiles: ListProperty<DebPackageBuilder>
 
     @get:Input
     abstract val accessKey: Property<String>
