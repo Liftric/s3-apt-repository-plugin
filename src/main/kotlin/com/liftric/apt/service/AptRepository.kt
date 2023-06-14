@@ -6,7 +6,6 @@ import com.liftric.apt.utils.FileHashUtil.md5Hash
 import com.liftric.apt.utils.FileHashUtil.sha1Hash
 import com.liftric.apt.utils.FileHashUtil.sha256Hash
 import com.liftric.apt.utils.FileHashUtil.sha512Hash
-import com.liftric.apt.utils.FileHashUtil.size
 import com.liftric.apt.utils.signReleaseFile
 import org.gradle.api.logging.Logger
 import java.io.File
@@ -74,19 +73,14 @@ fun getUsedPackagesPoolKeys(
     suite: String,
     component: String,
 ): Set<String> {
-    val files = s3Client.listAllObjects(bucket, getFullBucketKey(bucketPath, "dists/$suite/$component/binary-"))
-    val usedPackages = mutableSetOf<String>()
-    for (filePath in files) {
-        if (filePath.endsWith("Packages")) {
-            val file = s3Client.getObject(bucket, filePath)
-            val packagesInfo = readPackagesFile(file)
-
-            for (packageInfo in packagesInfo) {
-                packageInfo.fileName?.let { usedPackages.add(getFullBucketKey(bucketPath, it)) }
-            }
-        }
-    }
-    return usedPackages
+    val fileKeys = s3Client.listAllObjects(bucket, getFullBucketKey(bucketPath, "dists/$suite/$component/binary-"))
+    return fileKeys
+        .filter { key -> key.endsWith("Packages") }
+        .map { key -> s3Client.getObject(bucket, key) }
+        .flatMap { file -> readPackagesFile(file) }
+        .filter { packagesInfo -> packagesInfo.fileName != null }
+        .map { packagesInfo -> getFullBucketKey(bucketPath, packagesInfo.fileName!!) }
+        .toSet()
 }
 
 fun updateReleaseFiles(
@@ -122,28 +116,28 @@ fun updateReleaseFiles(
 
         val md5Sum = MD5Sum(
             packageFile.md5Hash(),
-            packageFile.size(),
+            packageFile.length(),
             relativeFilePath,
         )
         releaseInfo.md5Sum.add(md5Sum)
 
         val sha1 = SHA1(
             packageFile.sha1Hash(),
-            packageFile.size(),
+            packageFile.length(),
             relativeFilePath,
         )
         releaseInfo.sha1.add(sha1)
 
         val sha256 = SHA256(
             packageFile.sha256Hash(),
-            packageFile.size(),
+            packageFile.length(),
             relativeFilePath,
         )
         releaseInfo.sha256.add(sha256)
 
         val sha512 = SHA512(
             packageFile.sha512Hash(),
-            packageFile.size(),
+            packageFile.length(),
             relativeFilePath,
         )
         releaseInfo.sha512.add(sha512)

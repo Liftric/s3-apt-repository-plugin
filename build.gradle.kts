@@ -5,16 +5,25 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.dockerCompose)
     alias(libs.plugins.gradlePluginPublish)
+    alias(libs.plugins.nemerosaVersioning)
 }
-
+group = "com.liftric"
+version = with(versioning.info) {
+    if (branch == "HEAD" && dirty.not()) {
+        tag
+    } else {
+        full
+    }
+}
 repositories {
     mavenCentral()
     gradlePluginPortal()
+    mavenLocal()
 }
 
 sourceSets {
     val main by getting
-    val integrationTest by creating {
+    val integrationMain by creating {
         compileClasspath += main.output
         runtimeClasspath += main.output
     }
@@ -30,12 +39,12 @@ tasks {
         systemProperty("org.gradle.testkit.dir", gradle.gradleUserHomeDir)
     }
 
-    val integrationTest by sourceSets
-    val integrationTestTask = register<Test>("integrationTest") {
+    val integrationTest = register<Test>("integrationTest") {
+        val integrationMain by sourceSets
         description = "Runs the integration tests"
         group = "verification"
-        testClassesDirs = integrationTest.output.classesDirs
-        classpath = integrationTest.runtimeClasspath
+        testClassesDirs = integrationMain.output.classesDirs
+        classpath = integrationMain.runtimeClasspath
         mustRunAfter(test)
         useJUnitPlatform()
     }
@@ -43,15 +52,13 @@ tasks {
 
 
 gradlePlugin {
-    val integrationTest by sourceSets
-    testSourceSets(integrationTest)
+    val integrationMain by sourceSets
+    testSourceSets(integrationMain)
     plugins {
         create("s3-apt-repository-plugin") {
-            id = "${project.property("pluginGroup")}.${project.property("pluginName")}"
-            implementationClass = "${project.property("pluginGroup")}.apt.S3AptRepositoryPlugin"
-            displayName = project.property("pluginName").toString()
-            version = project.property("pluginVersion").toString()
-            group = project.property("pluginGroup").toString()
+            id = "$group.s3-apt-repository-plugin"
+            implementationClass = "$group.apt.S3AptRepositoryPlugin"
+            displayName = "s3-apt-repository-plugin"
         }
     }
 }
@@ -75,9 +82,9 @@ dependencies {
     testImplementation(libs.mockitoCore)
     testImplementation(libs.mockitoJUnit)
 
-    "integrationTestImplementation"(gradleTestKit())
-    "integrationTestImplementation"(libs.junitJupiter)
-    "integrationTestImplementation"(libs.testContainersJUnit5)
-    "integrationTestImplementation"(libs.testContainersMain)
-    "integrationTestImplementation"(libs.minio)
+    "integrationMainImplementation"(gradleTestKit())
+    "integrationMainImplementation"(libs.junitJupiter)
+    "integrationMainImplementation"(libs.testContainersJUnit5)
+    "integrationMainImplementation"(libs.testContainersMain)
+    "integrationMainImplementation"(libs.minio)
 }

@@ -5,7 +5,6 @@ import com.liftric.apt.utils.FileHashUtil.md5Hash
 import com.liftric.apt.utils.FileHashUtil.sha1Hash
 import com.liftric.apt.utils.FileHashUtil.sha256Hash
 import com.liftric.apt.utils.FileHashUtil.sha512Hash
-import com.liftric.apt.utils.FileHashUtil.size
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -54,7 +53,7 @@ class FileHashUtilTest {
     fun `file size test`() {
         val testFile = File("src/test/resources/test_hash.txt")
         val expectedFileSize = 6L
-        val actualFileSize = testFile.size()
+        val actualFileSize = testFile.length()
 
         assertEquals(expectedFileSize, actualFileSize)
     }

@@ -15,6 +15,7 @@ package com.liftric.apt.model
 
 data class ControlInfo(
     var packageInfo: String? = null,
+//    val version: String, TODO
     var version: String? = null,
     var source: String? = null,
     var architecture: String? = null,

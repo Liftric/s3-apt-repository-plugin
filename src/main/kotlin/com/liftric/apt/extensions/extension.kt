@@ -22,7 +22,7 @@ abstract class S3AptRepositoryPluginExtension(val project: Project) {
     abstract val override: Property<Boolean>
 
     /** You can specify multiple Debian Files for different Architectures */
-    abstract val debPackages: ListProperty<DebPackageBuilder>
+    abstract val debPackages: ListProperty<DebPackage>
 
     /** PGP Signing of Release File */
     abstract val signingKeyRingFile: RegularFileProperty
@@ -50,6 +50,6 @@ abstract class S3AptRepositoryPluginExtension(val project: Project) {
     abstract val component: Property<String>
 }
 
-fun S3AptRepositoryPluginExtension.debPackage(action: DebPackageBuilder.() -> Unit) {
-    debPackages.add(DebPackageBuilder(project).apply(action))
+fun S3AptRepositoryPluginExtension.debPackage(action: DebPackage.() -> Unit) {
+    debPackages.add(DebPackage(project).apply(action))
 }

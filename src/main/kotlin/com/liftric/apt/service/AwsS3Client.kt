@@ -36,8 +36,7 @@ class AwsS3Client(
         with(S3Client.builder()) {
             when {
                 endpoint != null -> {
-                    val endpoint = URI.create(endpoint)
-                    endpointOverride(endpoint)
+                    endpointOverride(URI.create(endpoint))
                 }
             }
             region(convertToRegion(region))

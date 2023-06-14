@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.verify  // https://mockk.io/#object-mocks
 import kotlin.io.path.createTempFile
 
 class GetUsedPackagesPoolKeysTest {

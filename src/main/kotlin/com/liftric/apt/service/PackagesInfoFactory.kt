@@ -12,7 +12,6 @@ import com.liftric.apt.model.PackagesInfo
 import com.liftric.apt.utils.FileHashUtil.md5Hash
 import com.liftric.apt.utils.FileHashUtil.sha1Hash
 import com.liftric.apt.utils.FileHashUtil.sha256Hash
-import com.liftric.apt.utils.FileHashUtil.size
 
 /**
  * The PackagesInfoFactory class serves a vital role in the management of apt repositories.
@@ -36,6 +35,9 @@ class PackagesInfoFactory(private val file: File) {
         setPackagesInfo()
     }
 
+    fun parse(): Pair<PackagesInfo, ControlInfo> = TODO()
+    // readDebFile + setPackagesInfo
+
     private fun readDebFile() {
         val arInput = ArArchiveInputStream(FileInputStream(file))
         var entry: ArArchiveEntry? = arInput.nextArEntry
@@ -57,51 +59,11 @@ class PackagesInfoFactory(private val file: File) {
         var tarEntry = tarInput.nextTarEntry
         while (tarEntry != null) {
             if (tarEntry.name == "./control") {
-                setControlInfo(tarInput)
+                controlInfo.parseControlInfo(String(tarInput.readBytes()))
             }
             tarEntry = tarInput.nextTarEntry
         }
         tarInput.close()
-    }
-
-    private fun setControlInfo(tarInput: TarArchiveInputStream) {
-        val controlFileContent = String(tarInput.readBytes())
-        val descriptionLines = mutableListOf<String>()
-        var isDescription = false
-        controlFileContent.lineSequence().forEach { line ->
-            when {
-                isDescription -> {
-                    descriptionLines.add(line.trim())
-                }
-
-                line.startsWith("Package: ") -> controlInfo.packageInfo = line.removePrefix("Package: ")
-                line.startsWith("Version: ") -> controlInfo.version = line.removePrefix("Version: ")
-                line.startsWith("Source: ") -> controlInfo.source = line.removePrefix("Source: ")
-                line.startsWith("Architecture: ") -> controlInfo.architecture = line.removePrefix("Architecture: ")
-                line.startsWith("Maintainer: ") -> controlInfo.maintainer = line.removePrefix("Maintainer: ")
-                line.startsWith("Installed-Size: ") -> controlInfo.installedSize = line.removePrefix("Installed-Size: ")
-                line.startsWith("Depends: ") -> controlInfo.depends = line.removePrefix("Depends: ")
-                line.startsWith("Pre-Depends: ") -> controlInfo.preDepends = line.removePrefix("Pre-Depends: ")
-                line.startsWith("Recommends: ") -> controlInfo.recommends = line.removePrefix("Recommends: ")
-                line.startsWith("Suggests: ") -> controlInfo.suggests = line.removePrefix("Suggests: ")
-                line.startsWith("Conflicts: ") -> controlInfo.conflicts = line.removePrefix("Conflicts: ")
-                line.startsWith("Replaces: ") -> controlInfo.replaces = line.removePrefix("Replaces: ")
-                line.startsWith("Enhances: ") -> controlInfo.enhances = line.removePrefix("Enhances: ")
-                line.startsWith("Breaks: ") -> controlInfo.breaks = line.removePrefix("Breaks: ")
-                line.startsWith("Built-Using: ") -> controlInfo.builtUsing = line.removePrefix("Built-Using: ")
-                line.startsWith("Multi-Arch: ") -> controlInfo.multiArch = line.removePrefix("Multi-Arch: ")
-                line.startsWith("Provides: ") -> controlInfo.provides = line.removePrefix("Provides: ")
-                line.startsWith("Section: ") -> controlInfo.section = line.removePrefix("Section: ")
-                line.startsWith("Priority: ") -> controlInfo.priority = line.removePrefix("Priority: ")
-                line.startsWith("Homepage: ") -> controlInfo.homepage = line.removePrefix("Homepage: ")
-                line.startsWith("Description: ") -> {
-                    isDescription = true
-                    val descriptionLine = line.removePrefix("Description: ")
-                    descriptionLines.add(descriptionLine.trim())
-                }
-            }
-        }
-        controlInfo.description = descriptionLines.joinToString(" ")
     }
 
     private fun setPackagesInfo() {
@@ -120,9 +82,49 @@ class PackagesInfoFactory(private val file: File) {
         packagesInfo.provides = controlInfo.provides
         packagesInfo.recommends = controlInfo.recommends
         packagesInfo.suggests = controlInfo.suggests
-        packagesInfo.size = file.size()
+        packagesInfo.size = file.length()
         packagesInfo.sha1 = file.sha1Hash()
         packagesInfo.sha256 = file.sha256Hash()
         packagesInfo.md5sum = file.md5Hash()
     }
+}
+
+internal fun ControlInfo.parseControlInfo(controlFileContent: String) {
+    println("controlFileContent=\n$controlFileContent")
+    val descriptionLines = mutableListOf<String>()
+    var isDescription = false
+    controlFileContent.lineSequence().forEach { line ->
+        when {
+            isDescription -> {
+                descriptionLines.add(line.trim())
+            }
+
+            line.startsWith("Package: ") -> packageInfo = line.removePrefix("Package: ")
+            line.startsWith("Version: ") -> version = line.removePrefix("Version: ")
+            line.startsWith("Source: ") -> source = line.removePrefix("Source: ")
+            line.startsWith("Architecture: ") -> architecture = line.removePrefix("Architecture: ")
+            line.startsWith("Maintainer: ") -> maintainer = line.removePrefix("Maintainer: ")
+            line.startsWith("Installed-Size: ") -> installedSize = line.removePrefix("Installed-Size: ")
+            line.startsWith("Depends: ") -> depends = line.removePrefix("Depends: ")
+            line.startsWith("Pre-Depends: ") -> preDepends = line.removePrefix("Pre-Depends: ")
+            line.startsWith("Recommends: ") -> recommends = line.removePrefix("Recommends: ")
+            line.startsWith("Suggests: ") -> suggests = line.removePrefix("Suggests: ")
+            line.startsWith("Conflicts: ") -> conflicts = line.removePrefix("Conflicts: ")
+            line.startsWith("Replaces: ") -> replaces = line.removePrefix("Replaces: ")
+            line.startsWith("Enhances: ") -> enhances = line.removePrefix("Enhances: ")
+            line.startsWith("Breaks: ") -> breaks = line.removePrefix("Breaks: ")
+            line.startsWith("Built-Using: ") -> builtUsing = line.removePrefix("Built-Using: ")
+            line.startsWith("Multi-Arch: ") -> multiArch = line.removePrefix("Multi-Arch: ")
+            line.startsWith("Provides: ") -> provides = line.removePrefix("Provides: ")
+            line.startsWith("Section: ") -> section = line.removePrefix("Section: ")
+            line.startsWith("Priority: ") -> priority = line.removePrefix("Priority: ")
+            line.startsWith("Homepage: ") -> homepage = line.removePrefix("Homepage: ")
+            line.startsWith("Description: ") -> {
+                isDescription = true
+                val descriptionLine = line.removePrefix("Description: ")
+                descriptionLines.add(descriptionLine.trim())
+            }
+        }
+    }
+    description = descriptionLines.joinToString(" ")
 }

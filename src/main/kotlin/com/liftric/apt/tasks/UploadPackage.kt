@@ -1,7 +1,7 @@
 package com.liftric.apt.tasks
 
 import com.liftric.apt.service.AwsS3Client
-import com.liftric.apt.extensions.DebPackageBuilder
+import com.liftric.apt.extensions.DebPackage
 import com.liftric.apt.model.*
 import com.liftric.apt.service.*
 import org.gradle.api.DefaultTask
@@ -17,7 +17,7 @@ import org.gradle.api.tasks.Optional
 
 abstract class UploadPackageTask : DefaultTask() {
     @get:Nested
-    abstract val debianFiles: ListProperty<DebPackageBuilder>
+    abstract val debianFiles: ListProperty<DebPackage>
 
     @get:Input
     abstract val accessKey: Property<String>
@@ -107,40 +107,40 @@ abstract class UploadPackageTask : DefaultTask() {
             packagesInfo.packagesInfo.version = packageVersion ?: packagesInfo.packagesInfo.version
 
             uploadDebianFile(
-                logger,
-                s3Client,
-                bucket,
-                bucketPath,
-                debianPoolBucketKey,
-                inputFile,
-                override.getOrElse(true)
+                logger = logger,
+                s3Client = s3Client,
+                bucket = bucket,
+                bucketPath = bucketPath,
+                bucketKey = debianPoolBucketKey,
+                file = inputFile,
+                override = override.getOrElse(true)
             )
 
             val packagesFiles =
                 updatePackagesFiles(
-                    logger,
-                    archs,
-                    suite,
-                    component,
-                    s3Client,
-                    bucket,
-                    bucketPath,
-                    packagesInfo.packagesInfo
+                    logger = logger,
+                    archList = archs,
+                    suite = suite,
+                    component = component,
+                    s3Client = s3Client,
+                    bucket = bucket,
+                    bucketPath = bucketPath,
+                    packagesInfo = packagesInfo.packagesInfo
                 )
 
-            uploadPackagesFiles(logger, packagesFiles, s3Client, bucket)
+            uploadPackagesFiles(logger = logger, packageFiles = packagesFiles, s3Client = s3Client, bucket = bucket)
 
             updateReleaseFiles(
-                logger,
-                s3Client,
-                bucket,
-                bucketPath,
-                suite,
-                component,
-                origin,
-                label,
-                signingKeyRingFileValue,
-                signingKeyPassphraseValue
+                logger = logger,
+                s3Client = s3Client,
+                bucket = bucket,
+                bucketPath = bucketPath,
+                suite = suite,
+                component = component,
+                origin = origin,
+                label = label,
+                signingKeyRingFile = signingKeyRingFileValue,
+                signingKeyPassphrase = signingKeyPassphraseValue
             )
         }
     }
