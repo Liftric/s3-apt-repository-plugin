@@ -1,5 +1,22 @@
 package com.liftric.apt.model
 
+/**
+ * The DebianPackage data class represents the metadata of a package in an apt repository.
+ * This metadata typically resides in "Packages" files within the repository and provides essential
+ * details about each package, such as its name, version, architecture, dependencies, conflicts,
+ * and various other properties.
+ *
+ * Each instance of this class corresponds to one package's metadata. The properties of this class
+ * mirror the fields found in the repository's "Packages" file entries.
+ *
+ * In addition to the package's attributes, this class includes methods for constructing a string representation
+ * of the package's metadata, suitable for inclusion in a "Packages" file.
+ *
+ * The `toFileString` method generates a string representation of a DebianPackage object that follows
+ * the conventional formatting in "Packages" files. This makes it easy to write the package's metadata back
+ * to a repository.
+ */
+
 data class DebianPackage(
     val packageName: String,
     val version: String,
