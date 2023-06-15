@@ -12,9 +12,10 @@ import java.io.FileInputStream
 import java.util.zip.GZIPInputStream
 
 class FileHashUtilTest {
+    private val testFile = File("src/test/resources/test_hash.txt")
+
     @Test
     fun `md5 hash test`() {
-        val testFile = File("src/test/resources/test_hash.txt")
         val expectedMd5Hash = "3858f62230ac3c915f300c664312c63f"
         val actualMd5Hash = testFile.md5Hash()
 
@@ -23,7 +24,6 @@ class FileHashUtilTest {
 
     @Test
     fun `sha1 hash test`() {
-        val testFile = File("src/test/resources/test_hash.txt")
         val expectedSha1Hash = "8843d7f92416211de9ebb963ff4ce28125932878"
         val actualSha1Hash = testFile.sha1Hash()
 
@@ -32,7 +32,6 @@ class FileHashUtilTest {
 
     @Test
     fun `sha256 hash test`() {
-        val testFile = File("src/test/resources/test_hash.txt")
         val expectedSha256Hash = "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"
         val actualSha256Hash = testFile.sha256Hash()
 
@@ -41,7 +40,6 @@ class FileHashUtilTest {
 
     @Test
     fun `sha512 hash test`() {
-        val testFile = File("src/test/resources/test_hash.txt")
         val expectedSha512Hash =
             "0a50261ebd1a390fed2bf326f2673c145582a6342d523204973d0219337f81616a8069b012587cf5635f6925f1b56c360230c19b273500ee013e030601bf2425"
         val actualSha512Hash = testFile.sha512Hash()
@@ -51,7 +49,6 @@ class FileHashUtilTest {
 
     @Test
     fun `gzip compression test`() {
-        val testFile = File("src/test/resources/test_hash.txt")
         val compressedFile = testFile.compressWithGzip()
 
         assertTrue(compressedFile.exists(), "Compressed file does not exist")

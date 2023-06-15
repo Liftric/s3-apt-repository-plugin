@@ -9,7 +9,6 @@ pluginManagement {
                 version("junit-bom", "5.9.3")
                 version("awsSdk", "2.17.125")
                 version("bouncycastle", "1.70")
-                version("mockito", "5.3.1")
 
                 plugin("dockerCompose", "com.avast.gradle.docker-compose").version("0.16.12")
                 plugin("kotlinJvm", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
@@ -28,8 +27,7 @@ pluginManagement {
                 library("testContainersJUnit5", "org.testcontainers", "junit-jupiter").version("1.18.3")
                 library("testContainersMain", "org.testcontainers", "testcontainers").version("1.18.3")
                 library("minio", "io.minio", "minio").version("8.5.3")
-                library("mockitoCore", "org.mockito", "mockito-core").versionRef("mockito")
-                library("mockitoJUnit", "org.mockito", "mockito-junit-jupiter").versionRef("mockito")
+                library("mockk", "io.mockk", "mockk").version("1.13.5")
             }
         }
     }

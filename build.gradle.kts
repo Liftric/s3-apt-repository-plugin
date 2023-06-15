@@ -79,8 +79,7 @@ dependencies {
     implementation(libs.awsS3)
 
     testImplementation(libs.junitJupiter)
-    testImplementation(libs.mockitoCore)
-    testImplementation(libs.mockitoJUnit)
+    testImplementation(libs.mockk)
 
     "integrationMainImplementation"(gradleTestKit())
     "integrationMainImplementation"(libs.junitJupiter)

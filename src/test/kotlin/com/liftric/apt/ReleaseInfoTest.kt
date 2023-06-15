@@ -7,7 +7,6 @@ import java.io.File
 import org.junit.jupiter.api.Assertions.assertEquals
 
 class ReleaseInfoTest {
-
     @Test
     fun `test parsing ReleaseInfo from file`() {
         val releaseInfoData = """

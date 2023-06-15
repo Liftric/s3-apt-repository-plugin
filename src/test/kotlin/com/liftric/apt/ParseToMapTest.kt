@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class ParseToMapTest {
-
     @Test
     fun `when input is properly formatted, it should return a correct map`() {
         val input = """

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test
 import java.io.File
 
 class ReleaseFactoryTest {
-
     @Test
     fun `test parseReleaseFile`() {
         val testReleaseFile = File("src/test/resources/Release")

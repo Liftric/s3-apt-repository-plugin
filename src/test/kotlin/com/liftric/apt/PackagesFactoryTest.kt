@@ -5,14 +5,12 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.File
 
-// https://mockk.io/#object-mocks
-
 class PackagesFactoryTest {
+    private val testDebFile = File("src/test/resources/foobar_1.0.0-1_all.deb")
+    private val archs = setOf("all", "amd64")
 
     @Test
     fun `test parseDebianFile`() {
-        val testDebFile = File("src/test/resources/foobar_1.0.0-1_all.deb")
-        val archs = setOf("all", "amd64")
         val list = PackagesFactory.parseDebianFile(testDebFile, archs, "foobar_1.0.0-1_all.deb", null, null)
 
         assert(list.isNotEmpty())
@@ -25,8 +23,6 @@ class PackagesFactoryTest {
 
     @Test
     fun `test parseDebianFile with custom input`() {
-        val testDebFile = File("src/test/resources/foobar_1.0.0-1_all.deb")
-        val archs = setOf("all", "amd64")
         val list = PackagesFactory.parseDebianFile(testDebFile, archs, "foobar_1.0.0-1_all.deb", "foobaz", "1.0.0")
 
         assert(list.isNotEmpty())

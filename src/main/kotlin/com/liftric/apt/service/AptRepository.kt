@@ -244,7 +244,7 @@ private fun getReleaseArchitecturesFromS3FileList(files: List<String>): String {
     }.toSet().joinToString(separator = " ")
 }
 
-private fun getFullBucketKey(bucketPath: String, bucketKey: String): String {
+internal fun getFullBucketKey(bucketPath: String, bucketKey: String): String {
     return when {
         bucketPath.endsWith('/') -> "$bucketPath$bucketKey"
         bucketPath.isBlank() -> bucketKey
@@ -252,7 +252,7 @@ private fun getFullBucketKey(bucketPath: String, bucketKey: String): String {
     }
 }
 
-private fun createTemporaryFile(content: String, fileName: String, prefix: String? = null): File {
+internal fun createTemporaryFile(content: String, fileName: String, prefix: String? = null): File {
     return File.createTempFile(fileName, prefix).apply {
         writeText(content)
         deleteOnExit()

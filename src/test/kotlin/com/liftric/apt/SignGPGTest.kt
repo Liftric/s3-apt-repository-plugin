@@ -13,14 +13,15 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import java.io.FileInputStream
 
-class ReleaseFileSigningTest {
+class SignGPGTest {
+    private val privateKeyFile = File("src/test/resources/private.key")
+    private val publicKeyFile = File("src/test/resources/public.key")
+    private val fakePublicKeyFile = File("src/test/resources/fake_public.key")
+    private val releaseFile = File("src/test/resources/Release")
+    private val passphrase = "abcd1234".toCharArray()
 
     @Test
     fun `release file signing test`() {
-        val privateKeyFile = File("src/test/resources/private.key")
-        val publicKeyFile = File("src/test/resources/public.key")
-        val releaseFile = File("src/test/resources/Release")
-        val passphrase = "abcd1234".toCharArray()
         val signedFile = signReleaseFile(privateKeyFile, passphrase, releaseFile)
 
         assertTrue(signedFile.exists(), "Signed file does not exist")
@@ -32,10 +33,6 @@ class ReleaseFileSigningTest {
 
     @Test
     fun `check wrong public key`() {
-        val privateKeyFile = File("src/test/resources/private.key")
-        val fakePublicKeyFile = File("src/test/resources/fake_public.key")
-        val releaseFile = File("src/test/resources/Release")
-        val passphrase = "abcd1234".toCharArray()
         val signedFile = signReleaseFile(privateKeyFile, passphrase, releaseFile)
 
         assertTrue(signedFile.exists(), "Signed file does not exist")

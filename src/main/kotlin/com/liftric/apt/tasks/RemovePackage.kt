@@ -2,7 +2,6 @@ package com.liftric.apt.tasks
 
 import com.liftric.apt.service.AwsS3Client
 import com.liftric.apt.extensions.DebPackage
-import com.liftric.apt.model.*
 import com.liftric.apt.service.*
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
@@ -71,10 +70,10 @@ abstract class RemovePackageTask : DefaultTask() {
         val bucketPathValue = bucketPath.get()
         val regionValue = region.get()
         val endpointValue = endpoint.orNull
-        val originValue = origin.orNull
-        val labelValue = label.orNull
-        val suiteValue = suite.orNull
-        val componentValue = component.orNull
+        val originValue = origin.get()
+        val labelValue = label.get()
+        val suiteValue = suite.get()
+        val componentValue = component.get()
 
         debianFilesValues.forEach { debianFile ->
             val inputFile = debianFile.file.get().asFile
@@ -85,10 +84,10 @@ abstract class RemovePackageTask : DefaultTask() {
             val bucketPath = debianFile.bucketPath.orNull ?: bucketPathValue
             val region = debianFile.region.orNull ?: regionValue
             val endpoint = debianFile.endpoint.orNull ?: endpointValue
-            val suite = debianFile.suite.orNull ?: suiteValue ?: DEFAULT_RELEASE_SUITE
-            val component = debianFile.component.orNull ?: componentValue ?: DEFAULT_RELEASE_COMPONENT
-            val origin = debianFile.origin.orNull ?: originValue ?: DEFAULT_RELEASE_ORIGIN
-            val label = debianFile.label.orNull ?: labelValue ?: DEFAULT_RELEASE_LABEL
+            val suite = debianFile.suite.orNull ?: suiteValue
+            val component = debianFile.component.orNull ?: componentValue
+            val origin = debianFile.origin.orNull ?: originValue
+            val label = debianFile.label.orNull ?: labelValue
             val packageName = debianFile.packageName.orNull
             val packageVersion = debianFile.packageVersion.orNull
             val signingKeyRingFileValue = signingKeyRingFile.orNull?.asFile

@@ -1,27 +1,30 @@
 package com.liftric.apt.aptRepository
 
 import com.liftric.apt.service.AwsS3Client
+import com.liftric.apt.service.getFullBucketKey
 import com.liftric.apt.service.uploadDebianFile
+import io.mockk.*
 import org.gradle.api.logging.Logger
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mockito.*
+import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.io.File
 
 class UploadDebianFileTest {
+    private val mockLogger = mockk<Logger>()
+    private val mockS3Client = mockk<AwsS3Client>()
+    private val mockFile = mockk<File>()
+    private val bucket = "mockBucket"
+    private val bucketPath = ""
+    private val bucketKey = "mockBucketKey"
+    private val fullBucketKey = getFullBucketKey(bucketPath, bucketKey)
+
     @Test
     fun `test uploadDebianFile method with override false`() {
-        val mockLogger = mock(Logger::class.java)
-        val mockS3Client = mock(AwsS3Client::class.java)
-        val mockFile = mock(File::class.java)
-
-        val bucket = "mockBucket"
-        val bucketPath = "mockBucketPath"
-        val bucketKey = "mockBucketKey"
         val override = false
 
-        `when`(mockS3Client.doesObjectExist(bucket, bucketKey)).thenReturn(true)
+        every { mockS3Client.doesObjectExist(bucket, bucketKey) } returns true
 
         val exception = assertThrows<RuntimeException> {
             uploadDebianFile(mockLogger, mockS3Client, bucket, bucketPath, bucketKey, mockFile, override)
@@ -31,37 +34,32 @@ class UploadDebianFileTest {
 
     @Test
     fun `test uploadDebianFile method with override true`() {
-        val mockLogger = mock(Logger::class.java)
-        val mockS3Client = mock(AwsS3Client::class.java)
-        val mockFile = mock(File::class.java)
-
-        val bucket = "mockBucket"
-        val bucketPath = ""
-        val bucketKey = "mockBucketKey"
         val override = true
 
-        `when`(mockS3Client.doesObjectExist(bucket, bucketKey)).thenReturn(true)
+        every { mockLogger.info(any<String>()) } just Runs
+        every { mockS3Client.doesObjectExist(bucket, bucketKey) } returns true
+        every { mockS3Client.uploadObject(bucket, fullBucketKey, mockFile) } returns mockk<PutObjectResponse>()
 
         assertDoesNotThrow {
             uploadDebianFile(mockLogger, mockS3Client, bucket, bucketPath, bucketKey, mockFile, override)
         }
+
+        verify { mockLogger.info("File uploaded to s3://$bucket/${fullBucketKey}") }
     }
+
 
     @Test
     fun `test uploadDebianFile method with override false and no version of package found`() {
-        val mockLogger = mock(Logger::class.java)
-        val mockS3Client = mock(AwsS3Client::class.java)
-        val mockFile = mock(File::class.java)
-
-        val bucket = "mockBucket"
-        val bucketPath = ""
-        val bucketKey = "mockBucketKey"
         val override = false
 
-        `when`(mockS3Client.doesObjectExist(bucket, bucketKey)).thenReturn(false)
+        every { mockLogger.info(any<String>()) } just Runs
+        every { mockS3Client.doesObjectExist(bucket, bucketKey) } returns false
+        every { mockS3Client.uploadObject(bucket, fullBucketKey, mockFile) } returns mockk<PutObjectResponse>()
 
         assertDoesNotThrow {
             uploadDebianFile(mockLogger, mockS3Client, bucket, bucketPath, bucketKey, mockFile, override)
         }
+
+        verify { mockLogger.info("File uploaded to s3://$bucket/${fullBucketKey}") }
     }
 }

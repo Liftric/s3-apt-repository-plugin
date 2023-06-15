@@ -16,6 +16,11 @@ import org.gradle.api.Project
 internal const val extensionName = "s3AptRepository"
 internal const val taskGroup = "S3 Apt Repository Plugin"
 
+const val DEFAULT_ORIGIN = "Debian"
+const val DEFAULT_LABEL = "Debian"
+const val DEFAULT_SUITE = "stable"
+const val DEFAULT_COMPONENT = "main"
+
 class S3AptRepositoryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val extension = project.extensions.create(extensionName, S3AptRepositoryPluginExtension::class.java, project)
@@ -33,10 +38,10 @@ class S3AptRepositoryPlugin : Plugin<Project> {
             task.debianFiles.set(extension.debPackages)
             task.signingKeyRingFile.set(extension.signingKeyRingFile)
             task.signingKeyPassphrase.set(extension.signingKeyPassphrase)
-            task.origin.set(extension.origin)
-            task.label.set(extension.label)
-            task.suite.set(extension.suite)
-            task.component.set(extension.component)
+            task.origin.set(extension.origin.convention(DEFAULT_ORIGIN))
+            task.label.set(extension.label.convention(DEFAULT_LABEL))
+            task.suite.set(extension.suite.convention(DEFAULT_SUITE))
+            task.component.set(extension.component.convention(DEFAULT_COMPONENT))
         }
 
         project.tasks.register("removePackage", RemovePackageTask::class.java) { task ->
@@ -51,10 +56,10 @@ class S3AptRepositoryPlugin : Plugin<Project> {
             task.debianFiles.set(extension.debPackages)
             task.signingKeyRingFile.set(extension.signingKeyRingFile)
             task.signingKeyPassphrase.set(extension.signingKeyPassphrase)
-            task.origin.set(extension.origin)
-            task.label.set(extension.label)
-            task.suite.set(extension.suite)
-            task.component.set(extension.component)
+            task.origin.set(extension.origin.convention(DEFAULT_ORIGIN))
+            task.label.set(extension.label.convention(DEFAULT_LABEL))
+            task.suite.set(extension.suite.convention(DEFAULT_SUITE))
+            task.component.set(extension.component.convention(DEFAULT_COMPONENT))
         }
 
         project.tasks.register("cleanPackages", CleanPackagesTask::class.java) { task ->
@@ -66,8 +71,8 @@ class S3AptRepositoryPlugin : Plugin<Project> {
             task.bucketPath.set(extension.bucketPath.convention(""))
             task.region.set(extension.region)
             task.endpoint.set(extension.endpoint)
-            task.suite.set(extension.suite.convention("stable"))
-            task.component.set(extension.component.convention("main"))
+            task.suite.set(extension.suite.convention(DEFAULT_SUITE))
+            task.component.set(extension.component.convention(DEFAULT_COMPONENT))
         }
     }
 }
