@@ -29,10 +29,10 @@ import java.nio.file.StandardCopyOption
  * from a minio bucket to ensure the cleanPackages task's effectiveness.
  */
 
-const val CLEAN_PACKAGES_TEST_LOCATION = "build/cleanPackagesTest"
 
 @Testcontainers
-class CleanPackageTest : AbstractContainerBaseTest() {
+class CleanPackages : ContainerBase() {
+    private val cleanPackagesTestLocation = "build/cleanPackagesTest"
 
     @Container
     val ubuntuContainer: GenericContainer<*> =
@@ -53,7 +53,7 @@ class CleanPackageTest : AbstractContainerBaseTest() {
             )
         )
 
-        val projectDir = File(CLEAN_PACKAGES_TEST_LOCATION)
+        val projectDir = File(cleanPackagesTestLocation)
         projectDir.mkdirs()
         Files.copy(
             Paths.get("src/integrationMain/resources/$PRIVATE_KEY_FILE"),

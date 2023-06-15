@@ -10,7 +10,7 @@ import org.gradle.api.provider.Property
  * Delete all Packages from pool that are not referenced in the Packages file
  */
 
-abstract class CleanPackagesTask : DefaultTask() {
+abstract class CleanPackages : DefaultTask() {
     @get:Input
     abstract val suite: Property<String>
 

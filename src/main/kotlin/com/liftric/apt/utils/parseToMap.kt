@@ -1,5 +1,13 @@
 package com.liftric.apt.utils
 
+/**
+ * This utility function, `parseToMap`, is used for parsing text-based files from an APT repository
+ * such as Release or Packages files.
+ *
+ * Note: This function does not check if the input text is properly formatted. Malformed input may
+ * lead to unexpected results.
+ */
+
 fun parseToMap(text: String): Map<String, String?> {
     val removeMultiLines = text
         .replace(Regex("\n\\s+"), " ")

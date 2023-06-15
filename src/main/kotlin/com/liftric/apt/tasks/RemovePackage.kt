@@ -14,7 +14,7 @@ import org.gradle.api.tasks.Optional
  * Removes a Package from the Packages file List inside an S3 Apt Repository
  */
 
-abstract class RemovePackageTask : DefaultTask() {
+abstract class RemovePackage : DefaultTask() {
     @get:Nested
     abstract val debianFiles: ListProperty<DebPackage>
 

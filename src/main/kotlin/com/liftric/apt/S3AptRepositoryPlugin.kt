@@ -25,7 +25,7 @@ class S3AptRepositoryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val extension = project.extensions.create(extensionName, S3AptRepositoryPluginExtension::class.java, project)
 
-        project.tasks.register("uploadPackage", UploadPackageTask::class.java) { task ->
+        project.tasks.register("uploadPackage", UploadPackage::class.java) { task ->
             task.group = taskGroup
             task.description = "Upload Package to S3 and create/update S3 Apt Repository"
             task.accessKey.set(extension.accessKey)
@@ -44,7 +44,7 @@ class S3AptRepositoryPlugin : Plugin<Project> {
             task.component.set(extension.component.convention(DEFAULT_COMPONENT))
         }
 
-        project.tasks.register("removePackage", RemovePackageTask::class.java) { task ->
+        project.tasks.register("removePackage", RemovePackage::class.java) { task ->
             task.group = taskGroup
             task.description = "Remove Package from S3 Apt Repository Packages List"
             task.accessKey.set(extension.accessKey)
@@ -62,7 +62,7 @@ class S3AptRepositoryPlugin : Plugin<Project> {
             task.component.set(extension.component.convention(DEFAULT_COMPONENT))
         }
 
-        project.tasks.register("cleanPackages", CleanPackagesTask::class.java) { task ->
+        project.tasks.register("cleanPackages", CleanPackages::class.java) { task ->
             task.group = taskGroup
             task.description = "Delete removed Packages from S3 Apt Repository"
             task.accessKey.set(extension.accessKey)

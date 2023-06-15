@@ -14,7 +14,7 @@ import org.gradle.api.tasks.Optional
  * Uploads a debian packages to a s3 bucket and create or update the Repository.
  */
 
-abstract class UploadPackageTask : DefaultTask() {
+abstract class UploadPackage : DefaultTask() {
     @get:Nested
     abstract val debianFiles: ListProperty<DebPackage>
 

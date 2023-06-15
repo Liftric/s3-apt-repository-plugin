@@ -12,32 +12,31 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
 import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
-import java.io.FileOutputStream
-import java.io.InputStream
+
 
 /**
- * This test verifies the correct functioning of the removePackage Gradle task.
- * removePackage is a Gradle task that removes a specific Version of a Package from
- * the Packages file from the Apt Repository. This task does not remove the actual
- * Debian File from the repository pool, so that users with an older version of the
- * Repository can still install the package. For deleting removed Packages use the
- * cleanPackages task.
+ * This test verifies the functionality of the uploadPackage Gradle task, which is
+ * responsible for creating an Apt Repository in an empty bucket or updating an existing Apt Repository.
+ * This Class test the updating functionality of an existing Apt Repository.
  *
- * To ensure that the Apt Repository is still functioning correctly, an Ubuntu container
- * is used for testing. This provides a controlled environment where potential errors or
- * issues can be isolated and diagnosed more effectively.
+ * To ensure that the Apt Repository is updated correctly, an Ubuntu container
+ * is used for testing. The newer version of the package with a different VERIFICATION_CODE
+ * gets installed and tested.
  *
  * Additionally, the Packages file from the Minio client is downloaded and checked. This
- * helps to confirm that the correct version of the package has been removed as intended.
+ * helps to confirm that the old Version is still present.
  */
 
-const val REMOVE_PACKAGE_TEST_LOCATION = "build/removePackageTest"
 
 @Testcontainers
-class RemovePackageTest : AbstractContainerBaseTest() {
+class UploadPackage : ContainerBase() {
+    private val uploadPackageTestLocation = "build/uploadPackageTest"
+
     @TempDir
     lateinit var tempDir: File
 
@@ -48,19 +47,18 @@ class RemovePackageTest : AbstractContainerBaseTest() {
             .withCommand("tail", "-f", "/dev/null")
 
     @Test
-    fun testRemovePackageTask() {
+    fun testUploadPackageTask() {
         uploadObjects(
-            REMOVE_PACKAGE_TEST_BUCKET, mapOf(
-                "src/integrationMain/resources/removePackage/Release" to "dists/stable/Release",
-                "src/integrationMain/resources/removePackage/Release.gpg" to "dists/stable/Release.gpg",
-                "src/integrationMain/resources/removePackage/Packages" to "dists/stable/main/binary-all/Packages",
-                "src/integrationMain/resources/removePackage/Packages.gz" to "dists/stable/main/binary-all/Packages.gz",
-                "src/integrationMain/resources/removePackage/foobar_1.0.0-1_all.deb" to "pool/main/f/foobar/foobar_1.0.0-1_all.deb",
-                "src/integrationMain/resources/removePackage/foobar_0.0.9-1_all.deb" to "pool/main/f/foobar/foobar_0.0.9-1_all.deb",
+            UPLOAD_PACKAGE_TEST_BUCKET, mapOf(
+                "src/integrationMain/resources/uploadPackage/Release" to "dists/stable/Release",
+                "src/integrationMain/resources/uploadPackage/Release.gpg" to "dists/stable/Release.gpg",
+                "src/integrationMain/resources/uploadPackage/Packages" to "dists/stable/main/binary-all/Packages",
+                "src/integrationMain/resources/uploadPackage/Packages.gz" to "dists/stable/main/binary-all/Packages.gz",
+                "src/integrationMain/resources/uploadPackage/foobar_1.0.0-1_all.deb" to "pool/main/f/foobar/foobar_1.0.0-1_all.deb",
             )
         )
 
-        val projectDir = File(REMOVE_PACKAGE_TEST_LOCATION)
+        val projectDir = File(uploadPackageTestLocation)
         projectDir.mkdirs()
         Files.copy(
             Paths.get("src/integrationMain/resources/$PRIVATE_KEY_FILE"),
@@ -72,7 +70,7 @@ class RemovePackageTest : AbstractContainerBaseTest() {
             projectDir.toPath().resolve(PUBLIC_KEY_FILE),
             StandardCopyOption.REPLACE_EXISTING
         )
-        projectDir.resolve("foobar").writeText(VERIFICATION_STRING)
+        projectDir.resolve("foobar").writeText(VERIFICATION_STRING_2)
         projectDir.resolve("settings.gradle.kts").writeText("")
         projectDir.resolve("build.gradle.kts").writeText(
             """
@@ -85,11 +83,11 @@ plugins {
 }
 
 group = "com.liftric.test"
-version = "1.0.0"
+version = "1.0.1"
 
 val createDeb = tasks.create("createDeb", Deb::class) {
     packageName = "foobar"
-    version = "0.0.9"
+    version = "1.0.1"
     release = "1"
     maintainer = "nvima <mirwald@liftric.com>"
     description = "Description"
@@ -107,7 +105,7 @@ val createDeb = tasks.create("createDeb", Deb::class) {
 }
 
 s3AptRepository {
-    bucket.set("$REMOVE_PACKAGE_TEST_BUCKET")
+    bucket.set("$UPLOAD_PACKAGE_TEST_BUCKET")
     region.set("eu-central-1")
     endpoint.set("http://localhost:${MINIO_CONTAINER.getMappedPort(MINIO_PORT)}")
     accessKey.set("$MINIO_ACCESS_KEY")
@@ -124,8 +122,12 @@ s3AptRepository {
         """
         )
 
-        val result = GradleRunner.create().withProjectDir(projectDir).withArguments("build", "removePackage")
+        val result = GradleRunner
+            .create()
+            .withProjectDir(projectDir)
+            .withArguments("build", "uploadPackage")
             .withPluginClasspath().build()
+
         assertTrue(result.output.contains("BUILD SUCCESSFUL"))
 
         val packageInstall = ubuntuContainer
@@ -136,19 +138,20 @@ s3AptRepository {
                 apt-get update -y &&
                 apt-get install -y gnupg &&
                 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $SIGNING_KEY_ID_LONG &&
-                echo "deb http://minio:$MINIO_PORT/$REMOVE_PACKAGE_TEST_BUCKET stable main" | tee /etc/apt/sources.list.d/s3bucket.list &&
+                echo "deb http://minio:$MINIO_PORT/$UPLOAD_PACKAGE_TEST_BUCKET stable main" | tee /etc/apt/sources.list.d/s3bucket.list &&
                 apt-get update -y &&
                 apt-get install -y foobar &&
                 cat /usr/bin/foobar
                 """
             )
-        assertTrue(packageInstall.stdout.contains(VERIFICATION_STRING))
+
+        assertTrue(packageInstall.stdout.contains(VERIFICATION_STRING_2))
         assertTrue(packageInstall.exitCode == 0)
 
         try {
             val stream: InputStream = minioClient.getObject(
                 GetObjectArgs.builder()
-                    .bucket(REMOVE_PACKAGE_TEST_BUCKET)
+                    .bucket(UPLOAD_PACKAGE_TEST_BUCKET)
                     .`object`("dists/stable/main/binary-all/Packages")
                     .build()
             )
@@ -164,7 +167,7 @@ s3AptRepository {
             stream.close()
 
             val debianPackages = PackagesFactory.parsePackagesFile(outputFile)
-            assertTrue(debianPackages.size == 1)
+            assertTrue(debianPackages.size == 2)
             assertTrue(debianPackages[0].packageName == "foobar")
             assertTrue(debianPackages[0].version == "1.0.0-1")
         } catch (e: Exception) {

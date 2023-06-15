@@ -13,8 +13,17 @@ import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
 
-object PackagesFactory {
+/**
+ * This class, PackagesFactory, serves two primary purposes related to Debian packages and APT repositories.
+ *
+ * Firstly, it's used to parse Debian files, specifically focusing on control files which contain metadata.
+ * This metadata is utilized to create a Packages file for an APT repository.
+ *
+ * Secondly, it is used to read Packages files from an APT repository. This allows for further operations
+ * or manipulations to be performed on the data retrieved from the repository.
+ */
 
+object PackagesFactory {
     fun parseDebianFile(
         file: File,
         archs: Set<String>,

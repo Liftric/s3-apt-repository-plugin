@@ -12,7 +12,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
-const val UPLOAD_PACKAGE_TEST_LOCATION_2 = "build/uploadPackageTest2"
 
 /**
  * This test verifies the functionality of the uploadPackage Gradle task, which is
@@ -28,7 +27,8 @@ const val UPLOAD_PACKAGE_TEST_LOCATION_2 = "build/uploadPackageTest2"
 
 
 @Testcontainers
-class UploadPackageTest2 : AbstractContainerBaseTest() {
+class UploadPackage2 : ContainerBase() {
+    private val uploadPackageTestLocation = "build/uploadPackageTest2"
 
     @Container
     val ubuntuContainer: GenericContainer<*> =
@@ -38,7 +38,7 @@ class UploadPackageTest2 : AbstractContainerBaseTest() {
 
     @Test
     fun testUploadPackageTask() {
-        val projectDir = File(UPLOAD_PACKAGE_TEST_LOCATION_2)
+        val projectDir = File(uploadPackageTestLocation)
         projectDir.mkdirs()
         Files.copy(
             Paths.get("src/integrationMain/resources/$PRIVATE_KEY_FILE"),
