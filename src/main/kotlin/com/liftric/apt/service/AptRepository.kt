@@ -245,12 +245,10 @@ private fun getReleaseArchitecturesFromS3FileList(files: List<String>): String {
 }
 
 private fun getFullBucketKey(bucketPath: String, bucketKey: String): String {
-    return if (bucketPath.lastOrNull() == '/') {
-        "$bucketPath$bucketKey"
-    } else if (bucketPath == "") {
-        bucketKey
-    } else {
-        "$bucketPath/$bucketKey"
+    return when {
+        bucketPath.endsWith('/') -> "$bucketPath$bucketKey"
+        bucketPath.isBlank() -> bucketKey
+        else -> "$bucketPath/$bucketKey"
     }
 }
 
