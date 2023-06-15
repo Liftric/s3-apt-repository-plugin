@@ -1,6 +1,5 @@
 package com.liftric.apt.utils
 
-//TODO Add tests
 fun parseToMap(text: String): Map<String, String?> {
     val removeMultiLines = text
         .replace(Regex("\n\\s+"), " ")
