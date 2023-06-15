@@ -26,7 +26,7 @@ s3AptRepository {
     secretKey.set(System.getenv("AWS_SECRET_KEY"))
     signingKeyPassphrase.set(System.getenv("PGP_PASSPHRASE"))
     signingKeyRingFile.set(file("private.key"))
-    debian {
+    debPackage {
         file.set(file("foobar_1.0.0-1_all.deb"))
         architectures.set(setOf("all", "amd64"))
     }
@@ -39,8 +39,8 @@ The `uploadPackage` task comes equipped with a range of both required and option
 
 - **bucket**: *(Required)* The name of the S3 bucket where the Apt Repository resides.
 - **region**: *(Required)* The AWS region of the S3 bucket.
-- **accessKey**: *(Required)* The AWS Access Key for accessing the S3 bucket. Can be overridden in the `debian` section.
-- **secretKey**: *(Required)* The AWS Secret Key for accessing the S3 bucket. Can be overridden in the `debian` section.
+- **accessKey**: *(Required)* The AWS Access Key for accessing the S3 bucket. Can be overridden in the `debPackage` section.
+- **secretKey**: *(Required)* The AWS Secret Key for accessing the S3 bucket. Can be overridden in the `debPackage` section.
 - **signingKeyRingFile**: *(Required)* The PGP private key file used for signing the Release files.
 - **signingKeyPassphrase**: *(Required)* The passphrase for the PGP private key.
 - **bucketPath**: *(Optional)* The path within the bucket to store the Apt Repository. If not specified, the repository is stored at the root of the bucket.
@@ -50,9 +50,9 @@ The `uploadPackage` task comes equipped with a range of both required and option
 - **label**: *(Optional)* The value of the 'Label' field in the Release files. By default, it is 'Debian'.
 - **suite**: *(Optional)* The value of the 'Suite' field in the Release files. By default, it is 'stable'.
 - **component**: *(Optional)* The value of the 'Component' field in the Release files. By default, it is 'main'.
-- **debian**: *(Required)* See below for more information.
+- **debPackage**: *(Required)* See below for more information.
  
-In the `debian` section, you can specify package-specific attributes. These can override the top-level attributes if needed:
+In the `debPackage` section, you can specify package-specific attributes. These can override the top-level attributes if needed:
 
 - **file**: *(Required)* The Debian package file to upload.
 - **architectures**: *(Required)* Set of architectures that the package supports.
@@ -67,8 +67,8 @@ The `removePackage` task comes equipped with a range of both required and option
 
 - **bucket**: *(Required)* The name of the S3 bucket where the Apt Repository resides.
 - **region**: *(Required)* The AWS region of the S3 bucket.
-- **accessKey**: *(Required)* The AWS Access Key for accessing the S3 bucket. Can be overridden in the `debian` section.
-- **secretKey**: *(Required)* The AWS Secret Key for accessing the S3 bucket. Can be overridden in the `debian` section.
+- **accessKey**: *(Required)* The AWS Access Key for accessing the S3 bucket. Can be overridden in the `debPackage` section.
+- **secretKey**: *(Required)* The AWS Secret Key for accessing the S3 bucket. Can be overridden in the `debPackage` section.
 - **signingKeyRingFile**: *(Required)* The PGP private key file used for signing the Release files.
 - **signingKeyPassphrase**: *(Required)* The passphrase for the PGP private key.
 - **bucketPath**: *(Optional)* The path within the bucket to store the Apt Repository. If not specified, the repository is stored at the root of the bucket.
@@ -77,9 +77,9 @@ The `removePackage` task comes equipped with a range of both required and option
 - **label**: *(Optional)* The value of the 'Label' field in the Release files. By default, it is 'Debian'.
 - **suite**: *(Optional)* The value of the 'Suite' field in the Release files. By default, it is 'stable'.
 - **component**: *(Optional)* The value of the 'Component' field in the Release files. By default, it is 'main'.
-- **debian**: *(Required)* See below for more information.
+- **debPackage**: *(Required)* See below for more information.
 
-In the `debian` section, you can specify package-specific attributes. These can override the top-level attributes if needed:
+In the `debPackage` section, you can specify package-specific attributes. These can override the top-level attributes if needed:
 
 - **file**: *(Required)* The Debian package file to extract Version and Package Name.
 - **architectures**: *(Required)* Set of architectures that the package supports.
@@ -94,8 +94,8 @@ The `cleanPackages` task comes equipped with a range of both required and option
 
 - **bucket**: *(Required)* The name of the S3 bucket where the Apt Repository resides.
 - **region**: *(Required)* The AWS region of the S3 bucket.
-- **accessKey**: *(Required)* The AWS Access Key for accessing the S3 bucket. Can be overridden in the `debian` section.
-- **secretKey**: *(Required)* The AWS Secret Key for accessing the S3 bucket. Can be overridden in the `debian` section.
+- **accessKey**: *(Required)* The AWS Access Key for accessing the S3 bucket. Can be overridden in the `debPackage` section.
+- **secretKey**: *(Required)* The AWS Secret Key for accessing the S3 bucket. Can be overridden in the `debPackage` section.
 - **bucketPath**: *(Optional)* The path within the bucket to store the Apt Repository. If not specified, the repository is stored at the root of the bucket.
 - **endpoint**: *(Optional)* Custom S3 endpoint. Use this to override the default AWS S3 endpoint.
 - **suite**: *(Optional)* The value of the 'Suite' field in the Release files. By default, it is 'stable'.

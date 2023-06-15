@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.gradlePluginPublish)
     alias(libs.plugins.nemerosaVersioning)
 }
+
 group = "com.liftric"
 version = with(versioning.info) {
     if (branch == "HEAD" && dirty.not()) {
@@ -39,7 +40,7 @@ tasks {
         systemProperty("org.gradle.testkit.dir", gradle.gradleUserHomeDir)
     }
 
-    val integrationTest = register<Test>("integrationTest") {
+    register<Test>("integrationTest") {
         val integrationMain by sourceSets
         description = "Runs the integration tests"
         group = "verification"
@@ -67,7 +68,7 @@ pluginBundle {
     website = "https://github.com/Liftric/s3-apt-repository-plugin"
     vcsUrl = "https://github.com/Liftric/s3-apt-repository-plugin"
     description = "A Gradle Plugin for managing an APT Repository on S3"
-    tags = listOf("s3", "apt", "repository", "plugin", "gradle")
+    tags = listOf("s3", "apt", "repository", "plugin", "gradle", "debian")
 }
 
 dependencies {
