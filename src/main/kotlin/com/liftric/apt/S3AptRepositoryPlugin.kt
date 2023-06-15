@@ -18,8 +18,7 @@ internal const val taskGroup = "S3 Apt Repository Plugin"
 
 class S3AptRepositoryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        val extension =
-            project.extensions.create(extensionName, S3AptRepositoryPluginExtension::class.java, project)
+        val extension = project.extensions.create(extensionName, S3AptRepositoryPluginExtension::class.java, project)
 
         project.tasks.register("uploadPackage", UploadPackageTask::class.java) { task ->
             task.group = taskGroup
@@ -73,7 +72,7 @@ class S3AptRepositoryPlugin : Plugin<Project> {
     }
 }
 
-fun Project.dependencyTrackCompanion(): S3AptRepositoryPluginExtension {
+fun Project.s3AptRepository(): S3AptRepositoryPluginExtension {
     return extensions.getByName(extensionName) as? S3AptRepositoryPluginExtension
         ?: throw IllegalStateException("$extensionName is not of the correct type")
 }

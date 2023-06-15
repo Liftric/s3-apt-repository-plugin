@@ -17,7 +17,7 @@ class S3AptRepositoryPluginTest {
     fun testExtension() {
         val project = ProjectBuilder.builder().build()
         project.pluginManager.apply("com.liftric.s3-apt-repository-plugin")
-        assertNotNull(project.dependencyTrackCompanion())
+        assertNotNull(project.s3AptRepository())
     }
 
     @Test
