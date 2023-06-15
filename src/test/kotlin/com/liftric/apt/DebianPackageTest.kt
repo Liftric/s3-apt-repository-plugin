@@ -3,7 +3,9 @@ package com.liftric.apt
 import com.liftric.apt.model.DebianPackage
 import com.liftric.apt.model.combineDebianPackages
 import com.liftric.apt.model.removeDebianPackage
+import com.liftric.apt.model.toFileString
 import org.junit.jupiter.api.Test
+import java.io.File
 
 
 class DebianPackageTest {
@@ -129,6 +131,41 @@ class DebianPackageTest {
         assert(combined.contains(package2))
         assert(!combined.contains(package3))
         assert(combined.size == 2)
+    }
+
+    @Test
+    fun `test toFileString for DebianPackage`() {
+        val expected = """
+            Package: foo
+            Version: 1.0.0
+            Architecture: all
+            Filename: foo_1.0.0_all.deb
+            Size: 123
+            
+        """.trimIndent() + "\n"
+
+        assert(expected == package1.toFileString())
+    }
+
+    @Test
+    fun `test toFileString for List of DebianPackage`() {
+        val packageList = listOf(package1, package2)
+        val expected = """
+            Package: foo
+            Version: 1.0.0
+            Architecture: all
+            Filename: foo_1.0.0_all.deb
+            Size: 123
+
+            Package: foo
+            Version: 1.0.1
+            Architecture: all
+            Filename: foo_1.0.1_all.deb
+            Size: 123
+
+        """.trimIndent() + "\n"
+
+        assert(expected == packageList.toFileString())
     }
 
 }
