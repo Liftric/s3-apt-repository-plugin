@@ -106,25 +106,20 @@ fun updateReleaseFiles(
         null
     }
 
-    val md5Sums = mutableListOf<MD5Sum>()
-    val sha1Sums = mutableListOf<SHA1>()
-    val sha256Sums = mutableListOf<SHA256>()
-    val sha512Sums = mutableListOf<SHA512>()
+    val files: List<String> =
+        s3Client.listAllObjects(bucket, getFullBucketKey(bucketPath, "dists/$suite/$component/binary-"))
 
-    val files: List<String> = s3Client.listAllObjects(bucket, getFullBucketKey(bucketPath, "dists/$suite/$component/binary-"))
-    for (filePath in files) {
+    val fileDataList = files.map { filePath ->
         val packageFile = s3Client.getObject(bucket, filePath)
         val relativeFilePath = "$component${filePath.substringAfter("$suite/$component")}"
 
-        md5Sums.add(MD5Sum(packageFile.md5Hash(), packageFile.length(), relativeFilePath))
-        sha1Sums.add(SHA1(packageFile.sha1Hash(), packageFile.length(), relativeFilePath))
-        sha256Sums.add(SHA256(packageFile.sha256Hash(), packageFile.length(), relativeFilePath))
-        sha512Sums.add(SHA512(packageFile.sha512Hash(), packageFile.length(), relativeFilePath))
+        FileData(
+            md5Sum = MD5Sum(packageFile.md5Hash(), packageFile.length(), relativeFilePath),
+            sha1Sum = SHA1(packageFile.sha1Hash(), packageFile.length(), relativeFilePath),
+            sha256Sum = SHA256(packageFile.sha256Hash(), packageFile.length(), relativeFilePath),
+            sha512Sum = SHA512(packageFile.sha512Hash(), packageFile.length(), relativeFilePath)
+        )
     }
-
-    //TODO Add option to override old Release file or add new attributes
-    //Currently there is no way to override old Release file attributes or set new attributes other
-    // than origin/label/suite/component that has a default value
 
     val newReleaseInfo = ReleaseInfo(
         origin = origin,
@@ -142,10 +137,10 @@ fun updateReleaseFiles(
         acquireByHash = oldReleaseInfo?.acquireByHash,
         changelogs = oldReleaseInfo?.changelogs,
         snapshots = oldReleaseInfo?.snapshots,
-        md5Sum = md5Sums,
-        sha1 = sha1Sums,
-        sha256 = sha256Sums,
-        sha512 = sha512Sums,
+        md5Sum = fileDataList.map { it.md5Sum },
+        sha1 = fileDataList.map { it.sha1Sum },
+        sha256 = fileDataList.map { it.sha256Sum },
+        sha512 = fileDataList.map { it.sha512Sum },
     )
 
     val releaseFile = createTemporaryFile(newReleaseInfo.toFileString(), "Release")
@@ -180,9 +175,7 @@ fun getUpdatedPackagesFiles(
     bucketPath: String,
     debianPackages: List<DebianPackage>,
 ): Map<String, File> {
-    val packagesFiles = mutableMapOf<String, File>()
-
-    debianPackages.forEach { debianPackage ->
+    return debianPackages.flatMap { debianPackage ->
         val relativePackagesFileLocation = "dists/$suite/$component/binary-${debianPackage.architecture}/Packages"
         val packagesFileLocation = getFullBucketKey(bucketPath, relativePackagesFileLocation)
 
@@ -198,11 +191,11 @@ fun getUpdatedPackagesFiles(
         }
         val gzipPackagesFile = packagesFile.compressWithGzip()
 
-        packagesFiles[packagesFileLocation] = packagesFile
-        packagesFiles["$packagesFileLocation.gz"] = gzipPackagesFile
-    }
-
-    return packagesFiles
+        listOf(
+            packagesFileLocation to packagesFile,
+            "$packagesFileLocation.gz" to gzipPackagesFile
+        )
+    }.toMap()
 }
 
 fun getCleanedPackagesFiles(
@@ -214,8 +207,7 @@ fun getCleanedPackagesFiles(
     bucketPath: String,
     debianPackages: List<DebianPackage>,
 ): Map<String, File> {
-    val packagesFiles = mutableMapOf<String, File>()
-    debianPackages.forEach { debianPackage ->
+    return debianPackages.flatMap { debianPackage ->
         val relativePackagesFileLocation = "dists/$suite/$component/binary-${debianPackage.architecture}/Packages"
         val packagesFileLocation = getFullBucketKey(bucketPath, relativePackagesFileLocation)
 
@@ -232,12 +224,13 @@ fun getCleanedPackagesFiles(
 
         val gzipPackagesFile = packagesFile.compressWithGzip()
 
-        packagesFiles[packagesFileLocation] = packagesFile
-        packagesFiles["$packagesFileLocation.gz"] = gzipPackagesFile
-    }
-
-    return packagesFiles
+        listOf(
+            packagesFileLocation to packagesFile,
+            "$packagesFileLocation.gz" to gzipPackagesFile
+        )
+    }.toMap()
 }
+
 
 private fun getReleaseDate(): String {
     val now = ZonedDateTime.now(ZoneId.of("UTC"))
@@ -246,12 +239,9 @@ private fun getReleaseDate(): String {
 }
 
 private fun getReleaseArchitecturesFromS3FileList(files: List<String>): String {
-    val archs = mutableSetOf<String>()
-    for (filePath in files) {
-        val arch = filePath.substringAfterLast("binary-").substringBefore("/Packages")
-        archs.add(arch)
-    }
-    return archs.joinToString(separator = " ")
+    return files.map { filePath ->
+        filePath.substringAfterLast("binary-").substringBefore("/Packages")
+    }.toSet().joinToString(separator = " ")
 }
 
 private fun getFullBucketKey(bucketPath: String, bucketKey: String): String {

@@ -66,6 +66,13 @@ data class SHA512(
     val filename: String,
 )
 
+data class FileData(
+    val md5Sum: MD5Sum,
+    val sha1Sum: SHA1,
+    val sha256Sum: SHA256,
+    val sha512Sum: SHA512,
+)
+
 fun ReleaseInfo.toFileString(): String {
     return buildString {
         appendLine("Origin: $origin")
