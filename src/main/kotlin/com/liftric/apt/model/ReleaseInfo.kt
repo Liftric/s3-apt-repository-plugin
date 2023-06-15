@@ -1,7 +1,5 @@
 package com.liftric.apt.model
 
-import java.io.File
-
 /**
  * The ReleaseInfo data class represents the metadata of a repository in an apt system.
  * This metadata typically resides in "Release" files within the repository and provides essential
@@ -22,31 +20,26 @@ import java.io.File
  * These checksums are typically included in "Release" files to ensure the integrity and authenticity of the package indexes.
  */
 
-const val DEFAULT_ORIGIN = "Debian"
-const val DEFAULT_LABEL = "Debian"
-const val DEFAULT_SUITE = "stable"
-const val DEFAULT_COMPONENT = "main"
-
 data class ReleaseInfo(
-    var origin: String = DEFAULT_ORIGIN,
-    var label: String = DEFAULT_LABEL,
-    var suite: String = DEFAULT_SUITE,
-    var components: String = DEFAULT_COMPONENT,
-    var architectures: String? = null,
-    var codename: String? = null,
-    var date: String? = null,
-    var description: String? = null,
-    var version: String? = null,
-    var validUntil: String? = null,
-    var notAutomatic: String? = null,
-    var butAutomaticUpgrades: String? = null,
-    var acquireByHash: String? = null,
-    var changelogs: String? = null,
-    var snapshots: String? = null,
-    var md5Sum: MutableList<MD5Sum> = mutableListOf(),
-    var sha1: MutableList<SHA1> = mutableListOf(),
-    var sha256: MutableList<SHA256> = mutableListOf(),
-    var sha512: MutableList<SHA512> = mutableListOf(),
+    val origin: String,
+    val label: String,
+    val suite: String,
+    val components: String,
+    val architectures: String?,
+    val codename: String?,
+    val date: String?,
+    val description: String?,
+    val version: String?,
+    val validUntil: String?,
+    val notAutomatic: String?,
+    val butAutomaticUpgrades: String?,
+    val acquireByHash: String?,
+    val changelogs: String?,
+    val snapshots: String?,
+    val md5Sum: List<MD5Sum>,
+    val sha1: List<SHA1>,
+    val sha256: List<SHA256>,
+    val sha512: List<SHA512>,
 )
 
 data class MD5Sum(
@@ -115,34 +108,4 @@ fun ReleaseInfo.toFileString(): String {
             }
         }
     }
-}
-
-fun parseReleaseFile(file: File): ReleaseInfo {
-    val releaseInfo = ReleaseInfo()
-
-    file.forEachLine { line ->
-        when {
-            line.startsWith("Origin:") -> releaseInfo.origin = line.removePrefix("Origin:").trim()
-            line.startsWith("Label:") -> releaseInfo.label = line.removePrefix("Label:").trim()
-            line.startsWith("Suite:") -> releaseInfo.suite = line.removePrefix("Suite:").trim()
-            line.startsWith("Codename:") -> releaseInfo.codename = line.removePrefix("Codename:").trim()
-            line.startsWith("Date:") -> releaseInfo.date = line.removePrefix("Date:").trim()
-            line.startsWith("Architectures:") -> releaseInfo.architectures = line.removePrefix("Architectures:").trim()
-            line.startsWith("Components:") -> releaseInfo.components = line.removePrefix("Components:").trim()
-            line.startsWith("Description:") -> releaseInfo.description = line.removePrefix("Description:").trim()
-            line.startsWith("Version:") -> releaseInfo.version = line.removePrefix("Version:").trim()
-            line.startsWith("ValidUntil:") -> releaseInfo.validUntil = line.removePrefix("ValidUntil:").trim()
-            line.startsWith("NotAutomatic:") -> releaseInfo.notAutomatic = line.removePrefix("NotAutomatic:").trim()
-            line.startsWith("ButAutomaticUpgrades:") -> releaseInfo.butAutomaticUpgrades =
-                line.removePrefix("ButAutomaticUpgrades:").trim()
-
-            line.startsWith("Acquire-By-Hash:") -> releaseInfo.acquireByHash =
-                line.removePrefix("Acquire-By-Hash:").trim()
-
-            line.startsWith("Changelogs:") -> releaseInfo.changelogs = line.removePrefix("Changelogs:").trim()
-            line.startsWith("Snapshots:") -> releaseInfo.snapshots = line.removePrefix("Snapshots:").trim()
-        }
-    }
-
-    return releaseInfo
 }

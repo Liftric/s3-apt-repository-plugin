@@ -4,6 +4,7 @@ import com.liftric.apt.utils.FileHashUtil.md5Hash
 import com.liftric.apt.utils.FileHashUtil.sha1Hash
 import com.liftric.apt.utils.FileHashUtil.sha256Hash
 import com.liftric.apt.model.DebianPackage
+import com.liftric.apt.utils.parseToMap
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry
 import org.apache.commons.compress.archivers.ar.ArArchiveInputStream
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
@@ -58,20 +59,6 @@ object PackagesFactory {
             )
         }
     }
-
-    private fun parseToMap(text: String): Map<String, String?> {
-        val removeMultiLines = text
-            .replace(Regex("\n\\s+"), " ")
-
-        val parsedMap = removeMultiLines.split("\n").associate {
-            val strings = it.split(": ")
-            strings[0].trim() to
-                    strings.getOrNull(1)
-                        ?.trim()
-        }
-        return parsedMap
-    }
-
 
     private fun parseControlInfo(
         file: File,

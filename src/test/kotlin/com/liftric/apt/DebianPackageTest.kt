@@ -5,8 +5,6 @@ import com.liftric.apt.model.combineDebianPackages
 import com.liftric.apt.model.removeDebianPackage
 import com.liftric.apt.model.toFileString
 import org.junit.jupiter.api.Test
-import java.io.File
-
 
 class DebianPackageTest {
     private val package1 = DebianPackage(
@@ -167,5 +165,4 @@ class DebianPackageTest {
 
         assert(expected == packageList.toFileString())
     }
-
 }

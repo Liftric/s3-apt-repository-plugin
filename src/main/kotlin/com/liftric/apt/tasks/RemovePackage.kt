@@ -85,10 +85,10 @@ abstract class RemovePackageTask : DefaultTask() {
             val bucketPath = debianFile.bucketPath.orNull ?: bucketPathValue
             val region = debianFile.region.orNull ?: regionValue
             val endpoint = debianFile.endpoint.orNull ?: endpointValue
-            val suite = debianFile.suite.orNull ?: suiteValue ?: DEFAULT_SUITE
-            val component = debianFile.component.orNull ?: componentValue ?: DEFAULT_COMPONENT
-            val origin = debianFile.origin.orNull ?: originValue
-            val label = debianFile.label.orNull ?: labelValue
+            val suite = debianFile.suite.orNull ?: suiteValue ?: DEFAULT_RELEASE_SUITE
+            val component = debianFile.component.orNull ?: componentValue ?: DEFAULT_RELEASE_COMPONENT
+            val origin = debianFile.origin.orNull ?: originValue ?: DEFAULT_RELEASE_ORIGIN
+            val label = debianFile.label.orNull ?: labelValue ?: DEFAULT_RELEASE_LABEL
             val packageName = debianFile.packageName.orNull
             val packageVersion = debianFile.packageVersion.orNull
             val signingKeyRingFileValue = signingKeyRingFile.orNull?.asFile

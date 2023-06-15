@@ -1,6 +1,7 @@
 package com.liftric.apt
 
 import com.liftric.apt.model.*
+import com.liftric.apt.service.ReleaseFactory
 import org.junit.jupiter.api.Test
 import java.io.File
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -20,7 +21,7 @@ class ReleaseInfoTest {
             Description: MyDescription
             Version: MyVersion
             NotAutomatic: MyNotAutomatic
-            ValidUntil: MyValidUntil
+            Valid-Until: MyValidUntil
             NotAutomatic: MyNotAutomatic
             ButAutomaticUpgrades: MyButAutomaticUpgrades
             Acquire-By-Hash: MyAcquireByHash
@@ -33,7 +34,7 @@ class ReleaseInfoTest {
             deleteOnExit()
         }
 
-        val releaseInfo = parseReleaseFile(tempFile)
+        val releaseInfo = ReleaseFactory.parseReleaseFile(tempFile)
 
         assertEquals("MyOrigin", releaseInfo.origin)
         assertEquals("MyLabel", releaseInfo.label)
@@ -74,7 +75,6 @@ class ReleaseInfoTest {
             sha1 = mutableListOf(SHA1(sha1 = "MySHA1", size = 234, filename = "sha1Filename")),
             sha256 = mutableListOf(SHA256(sha256 = "MySHA256", size = 345, filename = "sha256Filename")),
             sha512 = mutableListOf(SHA512(sha512 = "MySHA512", size = 456, filename = "sha512Filename")),
-
         )
 
         val fileString = releaseInfo.toFileString().trim()

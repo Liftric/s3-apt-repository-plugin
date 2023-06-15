@@ -26,7 +26,6 @@ data class DebianPackage(
     val md5sum: String?,
 )
 
-// TODO add Test
 fun DebianPackage.toFileString(): String {
     return buildString {
         appendLine("Package: $packageName")
@@ -56,7 +55,6 @@ fun DebianPackage.toFileString(): String {
     }
 }
 
-// TODO add Test
 fun List<DebianPackage>.toFileString(): String {
     return buildString {
         for (packageItem in this@toFileString) {
@@ -76,4 +74,3 @@ fun List<DebianPackage>.removeDebianPackage(
 ): List<DebianPackage> {
     return this.filter { it.packageName != debianPackage.packageName || it.version != debianPackage.version }
 }
-

@@ -90,75 +90,72 @@ fun updateReleaseFiles(
     bucketPath: String,
     suite: String,
     component: String,
-    origin: String?,
-    label: String?,
+    origin: String,
+    label: String,
     signingKeyRingFile: File? = null,
     signingKeyPassphrase: String? = null,
 ) {
-    val files = s3Client.listAllObjects(bucket, getFullBucketKey(bucketPath, "dists/$suite/$component/binary-"))
     val releaseFileLocation = getFullBucketKey(bucketPath, "dists/$suite/")
-    var releaseInfo = ReleaseInfo()
-    try {
+
+    val oldReleaseInfo: ReleaseInfo? = try {
         val releaseFile = s3Client.getObject(bucket, "${releaseFileLocation}Release")
         logger.info("Parsing Release file: s3://$bucket/${releaseFileLocation}Release")
-        releaseInfo = parseReleaseFile(releaseFile)
+        ReleaseFactory.parseReleaseFile(releaseFile)
     } catch (e: Exception) {
         logger.info("Release File not found, creating new Release file")
+        null
     }
 
-    releaseInfo.architectures = getReleaseArchitecturesFromS3FileList(files)
-    origin?.let { releaseInfo.origin = it }
-    label?.let { releaseInfo.label = it }
+    val md5Sums = mutableListOf<MD5Sum>()
+    val sha1Sums = mutableListOf<SHA1>()
+    val sha256Sums = mutableListOf<SHA256>()
+    val sha512Sums = mutableListOf<SHA512>()
 
+    val files: List<String> = s3Client.listAllObjects(bucket, getFullBucketKey(bucketPath, "dists/$suite/$component/binary-"))
     for (filePath in files) {
         val packageFile = s3Client.getObject(bucket, filePath)
         val relativeFilePath = "$component${filePath.substringAfter("$suite/$component")}"
 
-        val md5Sum = MD5Sum(
-            packageFile.md5Hash(),
-            packageFile.length(),
-            relativeFilePath,
-        )
-        releaseInfo.md5Sum.add(md5Sum)
-
-        val sha1 = SHA1(
-            packageFile.sha1Hash(),
-            packageFile.length(),
-            relativeFilePath,
-        )
-        releaseInfo.sha1.add(sha1)
-
-        val sha256 = SHA256(
-            packageFile.sha256Hash(),
-            packageFile.length(),
-            relativeFilePath,
-        )
-        releaseInfo.sha256.add(sha256)
-
-        val sha512 = SHA512(
-            packageFile.sha512Hash(),
-            packageFile.length(),
-            relativeFilePath,
-        )
-        releaseInfo.sha512.add(sha512)
-    }
-    releaseInfo.date = getReleaseDate()
-
-    val releaseString = releaseInfo.toFileString()
-    val releaseFile = File.createTempFile("${releaseFileLocation}Release", null).apply {
-        writeText(releaseString)
-        deleteOnExit()
+        md5Sums.add(MD5Sum(packageFile.md5Hash(), packageFile.length(), relativeFilePath))
+        sha1Sums.add(SHA1(packageFile.sha1Hash(), packageFile.length(), relativeFilePath))
+        sha256Sums.add(SHA256(packageFile.sha256Hash(), packageFile.length(), relativeFilePath))
+        sha512Sums.add(SHA512(packageFile.sha512Hash(), packageFile.length(), relativeFilePath))
     }
 
+    //TODO Add option to override old Release file or add new attributes
+    //Currently there is no way to override old Release file attributes or set new attributes other
+    // than origin/label/suite/component that has a default value
+
+    val newReleaseInfo = ReleaseInfo(
+        origin = origin,
+        label = label,
+        suite = suite,
+        components = component,
+        architectures = getReleaseArchitecturesFromS3FileList(files),
+        codename = oldReleaseInfo?.codename,
+        date = getReleaseDate(),
+        description = oldReleaseInfo?.description,
+        version = oldReleaseInfo?.version,
+        validUntil = oldReleaseInfo?.validUntil,
+        notAutomatic = oldReleaseInfo?.notAutomatic,
+        butAutomaticUpgrades = oldReleaseInfo?.butAutomaticUpgrades,
+        acquireByHash = oldReleaseInfo?.acquireByHash,
+        changelogs = oldReleaseInfo?.changelogs,
+        snapshots = oldReleaseInfo?.snapshots,
+        md5Sum = md5Sums,
+        sha1 = sha1Sums,
+        sha256 = sha256Sums,
+        sha512 = sha512Sums,
+    )
+
+    val releaseFile = createTemporaryFile(newReleaseInfo.toFileString(), "Release")
+
+    s3Client.uploadObject(bucket, "${releaseFileLocation}Release", releaseFile)
+    logger.info("Release file uploaded to s3://$bucket/${releaseFileLocation}Release")
     if (signingKeyRingFile != null && signingKeyPassphrase != null) {
         val signedReleaseFile = signReleaseFile(signingKeyRingFile, signingKeyPassphrase.toCharArray(), releaseFile)
         s3Client.uploadObject(bucket, "${releaseFileLocation}Release.gpg", signedReleaseFile)
         logger.info("Signed Release file uploaded to s3://$bucket/${releaseFileLocation}Release.gpg")
-        s3Client.uploadObject(bucket, "${releaseFileLocation}Release", releaseFile)
-        logger.info("Release file uploaded to s3://$bucket/${releaseFileLocation}Release")
-    } else {
-        s3Client.uploadObject(bucket, "${releaseFileLocation}Release", releaseFile)
-        logger.info("Release file uploaded to s3://$bucket/${releaseFileLocation}Release")
     }
 }
 
