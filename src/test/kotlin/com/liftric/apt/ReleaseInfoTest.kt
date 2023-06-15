@@ -70,10 +70,10 @@ class ReleaseInfoTest {
             acquireByHash = "MyAcquireByHash",
             changelogs = "MyChangelogs",
             snapshots = "MySnapshots",
-            md5Sum = mutableListOf(MD5Sum(md5 = "MyMD5Sum", size = 123, filename = "md5Filename")),
-            sha1 = mutableListOf(SHA1(sha1 = "MySHA1", size = 234, filename = "sha1Filename")),
-            sha256 = mutableListOf(SHA256(sha256 = "MySHA256", size = 345, filename = "sha256Filename")),
-            sha512 = mutableListOf(SHA512(sha512 = "MySHA512", size = 456, filename = "sha512Filename")),
+            md5Sum = listOf(MD5Sum(md5 = "MyMD5Sum", size = 123, filename = "md5Filename")),
+            sha1 = listOf(SHA1(sha1 = "MySHA1", size = 234, filename = "sha1Filename")),
+            sha256 = listOf(SHA256(sha256 = "MySHA256", size = 345, filename = "sha256Filename")),
+            sha512 = listOf(SHA512(sha512 = "MySHA512", size = 456, filename = "sha512Filename")),
         )
 
         val fileString = releaseInfo.toFileString().trim()
