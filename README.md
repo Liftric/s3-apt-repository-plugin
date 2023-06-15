@@ -8,7 +8,7 @@ This Gradle plugin enables you to manage an Apt Repository in an Amazon S3 bucke
 
 > **Recommendation**: To create Debian packages from a Gradle project, there is this Gradle plugin https://github.com/nebula-plugins/gradle-ospackage-plugin
 
->  **Caution**: This plugin is still in the early stages of development and has not yet been extensively tested in a production environment. It is strongly recommended to backup your S3 bucket before using this plugin in a production setting to prevent any potential data loss.
+> **Caution**: This plugin is still in the early stages of development and has not yet been extensively tested in a production environment. It is strongly recommended to backup your S3 bucket before using this plugin in a production setting to prevent any potential data loss.
 
 ## Example
 
