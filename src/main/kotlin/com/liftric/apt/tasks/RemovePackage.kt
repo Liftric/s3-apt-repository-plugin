@@ -77,7 +77,6 @@ abstract class RemovePackage : DefaultTask() {
 
         debianFilesValues.forEach { debianFile ->
             val inputFile = debianFile.file.get().asFile
-            val archs = debianFile.architectures.get()
             val accessKey = debianFile.accessKey.orNull ?: accessKeyValue
             val secretKey = debianFile.secretKey.orNull ?: secretKeyValue
             val bucket = debianFile.bucket.orNull ?: bucketValue
@@ -88,6 +87,7 @@ abstract class RemovePackage : DefaultTask() {
             val component = debianFile.component.orNull ?: componentValue
             val origin = debianFile.origin.orNull ?: originValue
             val label = debianFile.label.orNull ?: labelValue
+            val archs = debianFile.packageArchitectures.get()
             val packageName = debianFile.packageName.orNull
             val packageVersion = debianFile.packageVersion.orNull
             val signingKeyRingFileValue = signingKeyRingFile.orNull?.asFile

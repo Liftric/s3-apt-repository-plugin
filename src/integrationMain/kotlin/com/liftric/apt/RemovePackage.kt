@@ -117,7 +117,7 @@ s3AptRepository {
     signingKeyRingFile.set(file("$PRIVATE_KEY_FILE"))
     debPackage {
         file.set(createDeb.archiveFile)
-        architectures.set(setOf("all"))
+        packageArchitectures.set(setOf("all"))
         origin.set("Liftric")
         label.set("Liftric")
     }

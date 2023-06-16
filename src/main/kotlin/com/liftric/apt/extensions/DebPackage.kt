@@ -17,10 +17,6 @@ class DebPackage(@get:Internal val project: Project) {
     val file: RegularFileProperty = project.objects.fileProperty()
 
     @get:Input
-    // List of supported Architectures from Package
-    val architectures: SetProperty<String> = project.objects.setProperty(String::class.java)
-
-    @get:Input
     @get:Optional
     // Used for override the default bucket
     val bucket: Property<String?> = project.objects.property(String::class.java)
@@ -69,6 +65,10 @@ class DebPackage(@get:Internal val project: Project) {
     @get:Optional
     // Used for override the default Release label
     val label: Property<String?> = project.objects.property(String::class.java)
+
+    @get:Input
+    // List of supported Architectures from Package
+    val packageArchitectures: SetProperty<String> = project.objects.setProperty(String::class.java)
 
     @get:Input
     @get:Optional

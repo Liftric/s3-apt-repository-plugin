@@ -28,7 +28,7 @@ s3AptRepository {
     signingKeyRingFile.set(file("private.key"))
     debPackage {
         file.set(file("foobar_1.0.0-1_all.deb"))
-        architectures.set(setOf("all", "amd64"))
+        packageArchitectures.set(setOf("all", "amd64"))
     }
 }
 ```
@@ -55,10 +55,10 @@ The `uploadPackage` task comes equipped with a range of both required and option
 In the `debPackage` section, you can specify package-specific attributes. These can override the top-level attributes if needed:
 
 - **file**: *(Required)* The Debian package file to upload.
-- **architectures**: *(Required)* Set of architectures that the package supports.
-- **accessKey**, **secretKey**, **bucket**, **bucketPath**, **region**, **endpoint**: *(Optional)* These attributes can be used to override their respective top-level attributes for the specific package.
-- **suite**, **component**, **origin**, **label**: *(Optional)* These attributes can be used to override the default Release file fields for the specific package.
+- **packageArchitectures**: *(Required)* Set of architectures that the package supports.
 - **packageName**, **packageVersion**: *(Optional)* These attributes can be used to override the default package name and version extracted form the Debian File.
+- **suite**, **component**, **origin**, **label**: *(Optional)* These attributes can be used to override the default Release file fields for the specific package.
+- **accessKey**, **secretKey**, **bucket**, **bucketPath**, **region**, **endpoint**: *(Optional)* These attributes can be used to override their respective top-level attributes for the specific package.
  
 
 ### removePackage
@@ -82,10 +82,10 @@ The `removePackage` task comes equipped with a range of both required and option
 In the `debPackage` section, you can specify package-specific attributes. These can override the top-level attributes if needed:
 
 - **file**: *(Required)* The Debian package file to extract Version and Package Name.
-- **architectures**: *(Required)* Set of architectures that the package supports.
-- **accessKey**, **secretKey**, **bucket**, **bucketPath**, **region**, **endpoint**: *(Optional)* These attributes can be used to override their respective top-level attributes for the specific package.
-- **suite**, **component**, **origin**, **label**: *(Optional)* These attributes can be used to override the default Release file fields for the specific package.
+- **packageArchitectures**: *(Required)* Set of architectures that the package supports.
 - **packageName**, **packageVersion**: *(Optional)* These attributes can be used to override the default package name and version extracted form the Debian File.
+- **suite**, **component**, **origin**, **label**: *(Optional)* These attributes can be used to override the default Release file fields for the specific package.
+- **accessKey**, **secretKey**, **bucket**, **bucketPath**, **region**, **endpoint**: *(Optional)* These attributes can be used to override their respective top-level attributes for the specific package.
 
 
 ### cleanPackages
