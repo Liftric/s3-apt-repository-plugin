@@ -1,57 +1,10 @@
 package com.liftric.apt
 
 import com.liftric.apt.model.*
-import com.liftric.apt.service.ReleaseFactory
 import org.junit.jupiter.api.Test
-import java.io.File
 import org.junit.jupiter.api.Assertions.assertEquals
 
 class ReleaseInfoTest {
-    @Test
-    fun `test parsing ReleaseInfo from file`() {
-        val releaseInfoData = """
-            Origin: MyOrigin
-            Label: MyLabel
-            Suite: MySuite
-            Components: MyComponent
-            Codename: MyCodename
-            Date: MyDate
-            Architectures: MyArchitectures
-            Description: MyDescription
-            Version: MyVersion
-            NotAutomatic: MyNotAutomatic
-            Valid-Until: MyValidUntil
-            NotAutomatic: MyNotAutomatic
-            ButAutomaticUpgrades: MyButAutomaticUpgrades
-            Acquire-By-Hash: MyAcquireByHash
-            Changelogs: MyChangelogs
-            Snapshots: MySnapshots
-        """.trimIndent()
-
-        val tempFile = File.createTempFile("prefix", "suffix").apply {
-            writeText(releaseInfoData)
-            deleteOnExit()
-        }
-
-        val releaseInfo = ReleaseFactory.parseReleaseFile(tempFile)
-
-        assertEquals("MyOrigin", releaseInfo.origin)
-        assertEquals("MyLabel", releaseInfo.label)
-        assertEquals("MySuite", releaseInfo.suite)
-        assertEquals("MyComponent", releaseInfo.components)
-        assertEquals("MyCodename", releaseInfo.codename)
-        assertEquals("MyDate", releaseInfo.date)
-        assertEquals("MyArchitectures", releaseInfo.architectures)
-        assertEquals("MyDescription", releaseInfo.description)
-        assertEquals("MyVersion", releaseInfo.version)
-        assertEquals("MyValidUntil", releaseInfo.validUntil)
-        assertEquals("MyNotAutomatic", releaseInfo.notAutomatic)
-        assertEquals("MyButAutomaticUpgrades", releaseInfo.butAutomaticUpgrades)
-        assertEquals("MyAcquireByHash", releaseInfo.acquireByHash)
-        assertEquals("MyChangelogs", releaseInfo.changelogs)
-        assertEquals("MySnapshots", releaseInfo.snapshots)
-    }
-
     @Test
     fun `test converting ReleaseInfo to file string`() {
         val releaseInfo = ReleaseInfo(
@@ -67,7 +20,6 @@ class ReleaseInfoTest {
             validUntil = "MyValidUntil",
             notAutomatic = "MyNotAutomatic",
             butAutomaticUpgrades = "MyButAutomaticUpgrades",
-            acquireByHash = "MyAcquireByHash",
             changelogs = "MyChangelogs",
             snapshots = "MySnapshots",
             md5Sum = listOf(MD5Sum(md5 = "MyMD5Sum", size = 123, filename = "md5Filename")),
@@ -91,7 +43,6 @@ class ReleaseInfoTest {
             ValidUntil: MyValidUntil
             NotAutomatic: MyNotAutomatic
             ButAutomaticUpgrades: MyButAutomaticUpgrades
-            Acquire-By-Hash: MyAcquireByHash
             Changelogs: MyChangelogs
             Snapshots: MySnapshots
             MD5Sum:

@@ -1,19 +1,13 @@
 package com.liftric.apt
 
-import com.liftric.apt.service.PackagesFactory
-import io.minio.GetObjectArgs
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.fail
-import org.junit.jupiter.api.io.TempDir
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
 import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
@@ -22,23 +16,19 @@ import java.nio.file.StandardCopyOption
 /**
  * This test verifies the functionality of the uploadPackage Gradle task, which is
  * responsible for creating an Apt Repository in an empty bucket or updating an existing Apt Repository.
- * This Class test the updating functionality of an existing Apt Repository.
+ * This Class test the creation of a new Apt Repository.
  *
- * To ensure that the Apt Repository is updated correctly, an Ubuntu container
- * is used for testing. The newer version of the package with a different VERIFICATION_CODE
- * gets installed and tested.
- *
- * Additionally, the Packages file from the Minio client is downloaded and checked. This
- * helps to confirm that the old Version is still present.
+ * To ensure the newly created Apt Repository is functional, we use an Ubuntu container for
+ * testing. This container adds the new Apt Repository and attempts to install a package from it.
+ * The use of an Ubuntu container provides a controlled environment in which to verify the
+ * functionality of the new repository. The successful installation of the package indicates
+ * that the repository is working.
  */
 
 
 @Testcontainers
-class UploadPackage : ContainerBase() {
-    private val uploadPackageTestLocation = "build/uploadPackageTest"
-
-    @TempDir
-    lateinit var tempDir: File
+class UploadPackageTest2 : ContainerBase() {
+    private val uploadPackageTestLocation = "build/uploadPackageTest2"
 
     @Container
     val ubuntuContainer: GenericContainer<*> =
@@ -48,16 +38,6 @@ class UploadPackage : ContainerBase() {
 
     @Test
     fun testUploadPackageTask() {
-        uploadObjects(
-            UPLOAD_PACKAGE_TEST_BUCKET, mapOf(
-                "src/integrationMain/resources/uploadPackage/Release" to "dists/stable/Release",
-                "src/integrationMain/resources/uploadPackage/Release.gpg" to "dists/stable/Release.gpg",
-                "src/integrationMain/resources/uploadPackage/Packages" to "dists/stable/main/binary-all/Packages",
-                "src/integrationMain/resources/uploadPackage/Packages.gz" to "dists/stable/main/binary-all/Packages.gz",
-                "src/integrationMain/resources/uploadPackage/foobar_1.0.0-1_all.deb" to "pool/main/f/foobar/foobar_1.0.0-1_all.deb",
-            )
-        )
-
         val projectDir = File(uploadPackageTestLocation)
         projectDir.mkdirs()
         Files.copy(
@@ -70,7 +50,7 @@ class UploadPackage : ContainerBase() {
             projectDir.toPath().resolve(PUBLIC_KEY_FILE),
             StandardCopyOption.REPLACE_EXISTING
         )
-        projectDir.resolve("foobar").writeText(VERIFICATION_STRING_2)
+        projectDir.resolve("foobar").writeText(VERIFICATION_STRING)
         projectDir.resolve("settings.gradle.kts").writeText("")
         projectDir.resolve("build.gradle.kts").writeText(
             """
@@ -83,11 +63,11 @@ plugins {
 }
 
 group = "com.liftric.test"
-version = "1.0.1"
+version = "1.0.0"
 
 val createDeb = tasks.create("createDeb", Deb::class) {
     packageName = "foobar"
-    version = "1.0.1"
+    version = "1.0.0"
     release = "1"
     maintainer = "nvima <mirwald@liftric.com>"
     description = "Description"
@@ -105,7 +85,7 @@ val createDeb = tasks.create("createDeb", Deb::class) {
 }
 
 s3AptRepository {
-    bucket.set("$UPLOAD_PACKAGE_TEST_BUCKET")
+    bucket.set("$UPLOAD_PACKAGE_TEST_BUCKET_2")
     region.set("eu-central-1")
     endpoint.set("http://localhost:${MINIO_CONTAINER.getMappedPort(MINIO_PORT)}")
     accessKey.set("$MINIO_ACCESS_KEY")
@@ -138,40 +118,14 @@ s3AptRepository {
                 apt-get update -y &&
                 apt-get install -y gnupg &&
                 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $SIGNING_KEY_ID_LONG &&
-                echo "deb http://minio:$MINIO_PORT/$UPLOAD_PACKAGE_TEST_BUCKET stable main" | tee /etc/apt/sources.list.d/s3bucket.list &&
+                echo "deb http://minio:$MINIO_PORT/$UPLOAD_PACKAGE_TEST_BUCKET_2 stable main" | tee /etc/apt/sources.list.d/s3bucket.list &&
                 apt-get update -y &&
                 apt-get install -y foobar &&
                 cat /usr/bin/foobar
                 """
             )
 
-        assertTrue(packageInstall.stdout.contains(VERIFICATION_STRING_2))
+        assertTrue(packageInstall.stdout.contains(VERIFICATION_STRING))
         assertTrue(packageInstall.exitCode == 0)
-
-        try {
-            val stream: InputStream = minioClient.getObject(
-                GetObjectArgs.builder()
-                    .bucket(UPLOAD_PACKAGE_TEST_BUCKET)
-                    .`object`("dists/stable/main/binary-all/Packages")
-                    .build()
-            )
-
-            val outputFile = File(tempDir, "outputFile")
-            val outputStream = FileOutputStream(outputFile)
-            val buffer = ByteArray(1024)
-            var bytesRead: Int
-            while (stream.read(buffer).also { bytesRead = it } != -1) {
-                outputStream.write(buffer, 0, bytesRead)
-            }
-            outputStream.close()
-            stream.close()
-
-            val debianPackages = PackagesFactory.parsePackagesFile(outputFile)
-            assertTrue(debianPackages.size == 2)
-            assertTrue(debianPackages[0].packageName == "foobar")
-            assertTrue(debianPackages[0].version == "1.0.0-1")
-        } catch (e: Exception) {
-            fail("Unexpected exception: ${e.message}")
-        }
     }
 }

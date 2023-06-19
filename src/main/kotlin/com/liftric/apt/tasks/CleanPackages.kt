@@ -15,7 +15,7 @@ abstract class CleanPackages : DefaultTask() {
     abstract val suite: Property<String>
 
     @get:Input
-    abstract val component: Property<String>
+    abstract val components: Property<String>
 
     @get:Input
     abstract val accessKey: Property<String>
@@ -39,7 +39,7 @@ abstract class CleanPackages : DefaultTask() {
     @TaskAction
     fun main() {
         val suiteValue = suite.get()
-        val componentValue = component.get()
+        val componentValue = components.get()
         val accessKeyValue = accessKey.get()
         val secretKeyValue = secretKey.get()
         val bucketValue = bucket.get()

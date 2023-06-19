@@ -41,7 +41,17 @@ class S3AptRepositoryPlugin : Plugin<Project> {
             task.origin.set(extension.origin.convention(DEFAULT_ORIGIN))
             task.label.set(extension.label.convention(DEFAULT_LABEL))
             task.suite.set(extension.suite.convention(DEFAULT_SUITE))
-            task.component.set(extension.component.convention(DEFAULT_COMPONENT))
+            task.components.set(extension.components.convention(DEFAULT_COMPONENT))
+            task.architectures.set(extension.architectures)
+            task.codename.set(extension.codename)
+            task.date.set(extension.date)
+            task.releaseDescription.set(extension.releaseDescription)
+            task.releaseVersion.set(extension.releaseVersion)
+            task.validUntil.set(extension.validUntil)
+            task.notAutomatic.set(extension.notAutomatic)
+            task.butAutomaticUpgrades.set(extension.butAutomaticUpgrades)
+            task.changelogs.set(extension.changelogs)
+            task.snapshots.set(extension.snapshots)
         }
 
         project.tasks.register("removePackage", RemovePackage::class.java) { task ->
@@ -59,8 +69,18 @@ class S3AptRepositoryPlugin : Plugin<Project> {
             task.origin.set(extension.origin.convention(DEFAULT_ORIGIN))
             task.label.set(extension.label.convention(DEFAULT_LABEL))
             task.suite.set(extension.suite.convention(DEFAULT_SUITE))
-            task.component.set(extension.component.convention(DEFAULT_COMPONENT))
-        }
+            task.components.set(extension.components.convention(DEFAULT_COMPONENT))
+            task.architectures.set(extension.architectures)
+            task.codename.set(extension.codename)
+            task.date.set(extension.date)
+            task.releaseDescription.set(extension.releaseDescription)
+            task.releaseVersion.set(extension.releaseVersion)
+            task.validUntil.set(extension.validUntil)
+            task.notAutomatic.set(extension.notAutomatic)
+            task.butAutomaticUpgrades.set(extension.butAutomaticUpgrades)
+            task.changelogs.set(extension.changelogs)
+            task.snapshots.set(extension.snapshots)
+       }
 
         project.tasks.register("cleanPackages", CleanPackages::class.java) { task ->
             task.group = taskGroup
@@ -72,7 +92,7 @@ class S3AptRepositoryPlugin : Plugin<Project> {
             task.region.set(extension.region)
             task.endpoint.set(extension.endpoint)
             task.suite.set(extension.suite.convention(DEFAULT_SUITE))
-            task.component.set(extension.component.convention(DEFAULT_COMPONENT))
+            task.components.set(extension.components.convention(DEFAULT_COMPONENT))
         }
     }
 }

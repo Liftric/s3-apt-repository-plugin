@@ -33,7 +33,6 @@ data class ReleaseInfo(
     val validUntil: String?,
     val notAutomatic: String?,
     val butAutomaticUpgrades: String?,
-    val acquireByHash: String?,
     val changelogs: String?,
     val snapshots: String?,
     val md5Sum: List<MD5Sum>,
@@ -87,7 +86,6 @@ fun ReleaseInfo.toFileString(): String {
         validUntil?.let { appendLine("ValidUntil: $it") }
         notAutomatic?.let { appendLine("NotAutomatic: $it") }
         butAutomaticUpgrades?.let { appendLine("ButAutomaticUpgrades: $it") }
-        acquireByHash?.let { appendLine("Acquire-By-Hash: $it") }
         changelogs?.let { appendLine("Changelogs: $it") }
         snapshots?.let { appendLine("Snapshots: $it") }
         md5Sum.let { list ->

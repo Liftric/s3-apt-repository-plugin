@@ -31,7 +31,7 @@ import java.nio.file.StandardCopyOption
 
 
 @Testcontainers
-class CleanPackages : ContainerBase() {
+class CleanPackagesTest : ContainerBase() {
     private val cleanPackagesTestLocation = "build/cleanPackagesTest"
 
     @Container

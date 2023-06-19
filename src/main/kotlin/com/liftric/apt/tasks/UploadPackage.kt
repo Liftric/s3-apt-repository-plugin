@@ -2,6 +2,7 @@ package com.liftric.apt.tasks
 
 import com.liftric.apt.service.AwsS3Client
 import com.liftric.apt.extensions.DebPackage
+import com.liftric.apt.model.ReleaseInfo
 import com.liftric.apt.service.*
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
@@ -63,71 +64,129 @@ abstract class UploadPackage : DefaultTask() {
 
     @get:Input
     @get:Optional
-    abstract val component: Property<String>
+    abstract val components: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val architectures: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val codename: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val date: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val releaseDescription: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val releaseVersion: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val validUntil: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val notAutomatic: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val butAutomaticUpgrades: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val changelogs: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val snapshots: Property<String>
 
     @TaskAction
     fun main() {
-        val debianFilesValues = debianFiles.get()
-        val accessKeyValue = accessKey.get()
-        val secretKeyValue = secretKey.get()
-        val bucketValue = bucket.get()
-        val bucketPathValue = bucketPath.get()
-        val regionValue = region.get()
-        val endpointValue = endpoint.orNull
-        val originValue = origin.get()
-        val labelValue = label.get()
-        val suiteValue = suite.get()
-        val componentValue = component.get()
-
-        debianFilesValues.forEach { debianFile ->
+        debianFiles.get().forEach { debianFile ->
+            /** depPackage File **/
             val inputFile = debianFile.file.get().asFile
-            val accessKey = debianFile.accessKey.orNull ?: accessKeyValue
-            val secretKey = debianFile.secretKey.orNull ?: secretKeyValue
-            val region = debianFile.region.orNull ?: regionValue
-            val endpoint = debianFile.endpoint.orNull ?: endpointValue
-            val bucket = debianFile.bucket.orNull ?: bucketValue
-            val bucketPath = debianFile.bucketPath.orNull ?: bucketPathValue
-            val suite = debianFile.suite.orNull ?: suiteValue
-            val component = debianFile.component.orNull ?: componentValue
-            val origin = debianFile.origin.orNull ?: originValue
-            val label = debianFile.label.orNull ?: labelValue
-            val archs = debianFile.packageArchitectures.get()
+
+            /** Package file values **/
             val packageName = debianFile.packageName.orNull
             val packageVersion = debianFile.packageVersion.orNull
+            val packageArchitectures = debianFile.packageArchitectures.get()
+
+            /** GPG Signing **/
             val signingKeyRingFileValue = signingKeyRingFile.orNull?.asFile
             val signingKeyPassphraseValue = signingKeyPassphrase.orNull
 
+            /** AWS S3 values **/
+            val accessKey = debianFile.accessKey.orNull ?: accessKey.get()
+            val secretKey = debianFile.secretKey.orNull ?: secretKey.get()
+            val region = debianFile.region.orNull ?: region.get()
+            val endpoint = debianFile.endpoint.orNull ?: endpoint.orNull
+            val bucket = debianFile.bucket.orNull ?: bucket.get()
+            val bucketPath = debianFile.bucketPath.orNull ?: bucketPath.get()
+
+            /** Release file values **/
+            val suite = debianFile.suite.orNull ?: suite.get()
+            val components = debianFile.components.orNull ?: components.get()
+            val origin = debianFile.origin.orNull ?: origin.get()
+            val label = debianFile.label.orNull ?: label.get()
+            val architectures = debianFile.architectures.orNull ?: architectures.orNull
+            val codename = debianFile.codename.orNull ?: codename.orNull
+            val date = debianFile.date.orNull ?: date.orNull
+            val releaseDescription = debianFile.releaseDescription.orNull ?: releaseDescription.orNull
+            val releaseVersion = debianFile.releaseVersion.orNull ?: releaseVersion.orNull
+            val validUntil = debianFile.validUntil.orNull ?: validUntil.orNull
+            val notAutomatic = debianFile.notAutomatic.orNull ?: notAutomatic.orNull
+            val butAutomaticUpgrades = debianFile.butAutomaticUpgrades.orNull ?: butAutomaticUpgrades.orNull
+            val changelogs = debianFile.changelogs.orNull ?: changelogs.orNull
+            val snapshots = debianFile.snapshots.orNull ?: snapshots.orNull
+
             val s3Client = AwsS3Client(accessKey, secretKey, region, endpoint)
-
-            val debianPoolBucketKey = getPoolBucketKey(inputFile.name, component)
-
-            val debianPackages =
-                PackagesFactory.parseDebianFile(inputFile, archs, debianPoolBucketKey, packageName, packageVersion)
+            val debianPoolBucketKey = getPoolBucketKey(inputFile.name, components)
+            val debianPackages = PackagesFactory.parseDebianFile(
+                inputFile, packageArchitectures, debianPoolBucketKey, packageName, packageVersion
+            )
 
             uploadDebianFile(
-                logger,
-                s3Client,
-                bucket,
-                bucketPath,
-                debianPoolBucketKey,
-                inputFile,
-                override.getOrElse(true)
+                logger, s3Client, bucket, bucketPath, debianPoolBucketKey, inputFile, override.getOrElse(true)
             )
 
             val packagesFiles =
-                getUpdatedPackagesFiles(logger, suite, component, s3Client, bucket, bucketPath, debianPackages)
+                getUpdatedPackagesFiles(logger, suite, components, s3Client, bucket, bucketPath, debianPackages)
 
             uploadPackagesFiles(logger, packagesFiles, s3Client, bucket)
 
-            updateReleaseFiles(
+            val releaseInfo = ReleaseInfo(
+                origin,
+                label,
+                suite,
+                components,
+                architectures,
+                codename,
+                date,
+                releaseDescription,
+                releaseVersion,
+                validUntil,
+                notAutomatic,
+                butAutomaticUpgrades,
+                changelogs,
+                snapshots,
+                md5Sum = listOf(),
+                sha1 = listOf(),
+                sha256 = listOf(),
+                sha512 = listOf()
+            )
+
+            updateReleaseFile(
                 logger,
                 s3Client,
                 bucket,
                 bucketPath,
-                suite,
-                component,
-                origin,
-                label,
+                releaseInfo,
                 signingKeyRingFileValue,
                 signingKeyPassphraseValue
             )

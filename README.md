@@ -46,10 +46,25 @@ The `uploadPackage` task comes equipped with a range of both required and option
 - **bucketPath**: *(Optional)* The path within the bucket to store the Apt Repository. If not specified, the repository is stored at the root of the bucket.
 - **endpoint**: *(Optional)* Custom S3 endpoint. Use this to override the default AWS S3 endpoint.
 - **override**: *(Optional)* Boolean value indicating whether to override existing version of a Package. By default, it is `true`.
+ 
+`Release File Attributes` can be override in s3AptRepository or per debPackage
+
 - **origin**: *(Optional)* The value of the 'Origin' field in the Release files. By default, it is 'Debian'.
 - **label**: *(Optional)* The value of the 'Label' field in the Release files. By default, it is 'Debian'.
 - **suite**: *(Optional)* The value of the 'Suite' field in the Release files. By default, it is 'stable'.
 - **component**: *(Optional)* The value of the 'Component' field in the Release files. By default, it is 'main'.
+- **architectures**: *(Optional)* The value of the 'Architectures' field in the Release files. By default, it is set correctly by the Plugin. If you need to override it, you can do so here.
+- **codename**: *(Optional)* The value of the 'Codename' field in the Release files. By default, it is not set.
+- **date**: *(Optional)* The value of the 'Date' field in the Release files. By default, it is set to the current date.
+- **releaseDescription**: *(Optional)* The value of the 'Description' field in the Release files. By default, it is not set.
+- **releaseVersion**: *(Optional)* The value of the 'Version' field in the Release files. By default, it is not set.
+- **validUntil**: *(Optional)* The value of the 'Valid-Until' field in the Release files. By default, it is not set.
+- **notAutomatic**: *(Optional)* The value of the 'NotAutomatic' field in the Release files. By default, it is not set.
+- **butAutomaticUpgrades**: *(Optional)* The value of the 'ButAutomaticUpgrades' field in the Release files. By default, it is not set.
+- **changelogs**: *(Optional)* The value of the 'Changelogs' field in the Release files. By default, it is not set.
+- **snapshots**: *(Optional)* The value of the 'Snapshots' field in the Release files. By default, it is not set.
+
+
 - **debPackage**: *(Required)* See below for more information.
  
 In the `debPackage` section, you can specify package-specific attributes. These can override the top-level attributes if needed:
@@ -57,8 +72,11 @@ In the `debPackage` section, you can specify package-specific attributes. These 
 - **file**: *(Required)* The Debian package file to upload.
 - **packageArchitectures**: *(Required)* Set of architectures that the package supports.
 - **packageName**, **packageVersion**: *(Optional)* These attributes can be used to override the default package name and version extracted form the Debian File.
-- **suite**, **component**, **origin**, **label**: *(Optional)* These attributes can be used to override the default Release file fields for the specific package.
+- **origin**, **label**, **suite**, **component**, **architectures**, **codename**, **date**, **releaseDescription**, **releaseVersion**, **validUntil**, **notAutomatic**, **butAutomaticUpgrades**, **changelogs**, **snapshots** : *(Optional)* These attributes can be used to override the default Release file fields for the specific package.
 - **accessKey**, **secretKey**, **bucket**, **bucketPath**, **region**, **endpoint**: *(Optional)* These attributes can be used to override their respective top-level attributes for the specific package.
+
+
+
  
 
 ### removePackage
@@ -74,9 +92,23 @@ The `removePackage` task comes equipped with a range of both required and option
 - **bucketPath**: *(Optional)* The path within the bucket to store the Apt Repository. If not specified, the repository is stored at the root of the bucket.
 - **endpoint**: *(Optional)* Custom S3 endpoint. Use this to override the default AWS S3 endpoint.
 - **origin**: *(Optional)* The value of the 'Origin' field in the Release files. By default, it is 'Debian'.
+
+`Release File Attributes` can be override in s3AptRepository or per debPackage
+
 - **label**: *(Optional)* The value of the 'Label' field in the Release files. By default, it is 'Debian'.
 - **suite**: *(Optional)* The value of the 'Suite' field in the Release files. By default, it is 'stable'.
 - **component**: *(Optional)* The value of the 'Component' field in the Release files. By default, it is 'main'.
+- **architectures**: *(Optional)* The value of the 'Architectures' field in the Release files. By default, it is set correctly by the Plugin. If you need to override it, you can do so here.
+- **codename**: *(Optional)* The value of the 'Codename' field in the Release files. By default, it is not set.
+- **date**: *(Optional)* The value of the 'Date' field in the Release files. By default, it is set to the current date.
+- **releaseDescription**: *(Optional)* The value of the 'Description' field in the Release files. By default, it is not set.
+- **releaseVersion**: *(Optional)* The value of the 'Version' field in the Release files. By default, it is not set.
+- **validUntil**: *(Optional)* The value of the 'Valid-Until' field in the Release files. By default, it is not set.
+- **notAutomatic**: *(Optional)* The value of the 'NotAutomatic' field in the Release files. By default, it is not set.
+- **butAutomaticUpgrades**: *(Optional)* The value of the 'ButAutomaticUpgrades' field in the Release files. By default, it is not set.
+- **changelogs**: *(Optional)* The value of the 'Changelogs' field in the Release files. By default, it is not set.
+- **snapshots**: *(Optional)* The value of the 'Snapshots' field in the Release files. By default, it is not set.
+
 - **debPackage**: *(Required)* See below for more information.
 
 In the `debPackage` section, you can specify package-specific attributes. These can override the top-level attributes if needed:
@@ -84,7 +116,7 @@ In the `debPackage` section, you can specify package-specific attributes. These 
 - **file**: *(Required)* The Debian package file to extract Version and Package Name.
 - **packageArchitectures**: *(Required)* Set of architectures that the package supports.
 - **packageName**, **packageVersion**: *(Optional)* These attributes can be used to override the default package name and version extracted form the Debian File.
-- **suite**, **component**, **origin**, **label**: *(Optional)* These attributes can be used to override the default Release file fields for the specific package.
+- **origin**, **label**, **suite**, **component**, **architectures**, **codename**, **date**, **releaseDescription**, **releaseVersion**, **validUntil**, **notAutomatic**, **butAutomaticUpgrades**, **changelogs**, **snapshots** : *(Optional)* These attributes can be used to override the default Release file fields for the specific package.
 - **accessKey**, **secretKey**, **bucket**, **bucketPath**, **region**, **endpoint**: *(Optional)* These attributes can be used to override their respective top-level attributes for the specific package.
 
 

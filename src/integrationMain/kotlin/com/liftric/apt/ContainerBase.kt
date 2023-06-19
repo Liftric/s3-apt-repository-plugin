@@ -5,6 +5,9 @@ import org.testcontainers.containers.GenericContainer
 import org.testcontainers.utility.DockerImageName
 import io.minio.errors.MinioException
 import org.testcontainers.containers.Network
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
 
 /**
  * This is an abstract base class upon which all test classes are built.
@@ -110,7 +113,21 @@ abstract class ContainerBase {
                         .build()
                 )
             }
+        }
 
+        fun getFileFromBucket(path: String, bucket: String): File {
+            val stream: InputStream = minioClient.getObject(
+                GetObjectArgs.builder()
+                    .bucket(bucket)
+                    .`object`(path)
+                    .build()
+            )
+            return File.createTempFile(path.substringAfterLast("/"), null).apply {
+                deleteOnExit()
+                FileOutputStream(this).use { output ->
+                    stream.copyTo(output)
+                }
+            }
         }
     }
 }
