@@ -1,0 +1,13 @@
+Package: foobar
+Version: 1.0.0-1
+Architecture: all
+Maintainer: nvima <mirwald@liftric.com>
+Installed-Size: 0
+Section: java
+Priority: optional
+Description: foobar 
+Filename: pool/main/f/foobar/foobar_1.0.0-1_all.deb
+Size: 1018
+SHA1: abd00a88a4ff3eb30dfe4412779ca97c5aabf529
+SHA256: b9381b36cf73b10ba01a6cdfa50be13e807687cdf434925e18278d109920b1b2
+MD5sum: 53829e7ab536c57c2fddc96d0e2690b8
