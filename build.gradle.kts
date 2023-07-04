@@ -68,7 +68,7 @@ pluginBundle {
     website = "https://github.com/Liftric/s3-apt-repository-plugin"
     vcsUrl = "https://github.com/Liftric/s3-apt-repository-plugin"
     description = "A Gradle Plugin for managing an APT Repository on S3"
-    tags = listOf("s3", "apt", "repository", "plugin", "gradle", "debian")
+    tags = listOf("s3", "apt", "repository", "debian")
 }
 
 dependencies {
