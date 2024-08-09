@@ -30,7 +30,7 @@ abstract class ContainerBase {
         val network: Network = Network.newNetwork()
 
         val MINIO_CONTAINER: GenericContainer<*> =
-            GenericContainer(DockerImageName.parse("quay.io/minio/minio:RELEASE.2023-06-02T23-17-26Z"))
+            GenericContainer(DockerImageName.parse("quay.io/minio/minio:RELEASE.2024-08-03T04-33-23Z"))
                 .withPrivilegedMode(true)
                 .withNetwork(network)
                 .withNetworkAliases("minio")
