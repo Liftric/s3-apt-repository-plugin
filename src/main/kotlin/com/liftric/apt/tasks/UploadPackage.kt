@@ -40,6 +40,10 @@ abstract class UploadPackage : DefaultTask() {
 
     @get:Input
     @get:Optional
+    abstract val usePathStyle: Property<Boolean>
+
+    @get:Input
+    @get:Optional
     abstract val override: Property<Boolean>
 
     @get:InputFile
@@ -126,6 +130,7 @@ abstract class UploadPackage : DefaultTask() {
             val secretKey = debianFile.secretKey.orNull ?: secretKey.get()
             val region = debianFile.region.orNull ?: region.get()
             val endpoint = debianFile.endpoint.orNull ?: endpoint.orNull
+            val usePathStyle = debianFile.usePathStyle.orNull ?: usePathStyle.orNull ?: false
             val bucket = debianFile.bucket.orNull ?: bucket.get()
             val bucketPath = debianFile.bucketPath.orNull ?: bucketPath.get()
 
@@ -145,7 +150,7 @@ abstract class UploadPackage : DefaultTask() {
             val changelogs = debianFile.changelogs.orNull ?: changelogs.orNull
             val snapshots = debianFile.snapshots.orNull ?: snapshots.orNull
 
-            val s3Client = AwsS3Client(accessKey, secretKey, region, endpoint)
+            val s3Client = AwsS3Client(accessKey, secretKey, region, endpoint, usePathStyle)
             val debianPoolBucketKey = getPoolBucketKey(inputFile.name, components)
             val debianPackages = PackagesFactory.parseDebianFile(
                 inputFile, packageArchitectures, debianPoolBucketKey, packageName, packageVersion

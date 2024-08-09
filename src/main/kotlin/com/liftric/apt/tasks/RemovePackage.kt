@@ -38,6 +38,10 @@ abstract class RemovePackage : DefaultTask() {
     @get:Optional
     abstract val endpoint: Property<String>
 
+    @get:Input
+    @get:Optional
+    abstract val usePathStyle: Property<Boolean>
+
     @get:InputFile
     @get:Optional
     abstract val signingKeyRingFile: RegularFileProperty
@@ -124,6 +128,7 @@ abstract class RemovePackage : DefaultTask() {
             val bucketPath = debianFile.bucketPath.orNull ?: bucketPath.get()
             val region = debianFile.region.orNull ?: region.get()
             val endpoint = debianFile.endpoint.orNull ?: endpoint.orNull
+            val usePathStyle = debianFile.usePathStyle.orNull ?: usePathStyle.orNull ?: false
 
             /** Release file values **/
             val origin = debianFile.origin.orNull ?: origin.get()
@@ -141,7 +146,7 @@ abstract class RemovePackage : DefaultTask() {
             val changelogs = debianFile.changelogs.orNull ?: changelogs.orNull
             val snapshots = debianFile.snapshots.orNull ?: snapshots.orNull
 
-            val s3Client = AwsS3Client(accessKey, secretKey, region, endpoint)
+            val s3Client = AwsS3Client(accessKey, secretKey, region, endpoint, usePathStyle)
             val debianPackages =
                 PackagesFactory.parseDebianFile(inputFile, archs, "", packageName, packageVersion)
 

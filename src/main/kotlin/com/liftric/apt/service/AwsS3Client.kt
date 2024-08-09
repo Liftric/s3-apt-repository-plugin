@@ -30,7 +30,8 @@ class AwsS3Client(
     accessKey: String,
     secretKey: String,
     region: String,
-    endpoint: String? = null,
+    endpoint: String?,
+    usePathStyle: Boolean,
 ) {
     private val s3Client by lazy {
         with(S3Client.builder()) {
@@ -39,6 +40,7 @@ class AwsS3Client(
                     endpointOverride(URI.create(endpoint))
                 }
             }
+            forcePathStyle(usePathStyle)
             region(convertToRegion(region))
             credentialsProvider(
                 StaticCredentialsProvider.create(

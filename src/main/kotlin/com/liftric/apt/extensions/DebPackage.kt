@@ -39,6 +39,11 @@ class DebPackage(@get:Internal val project: Project) {
 
     @get:Input
     @get:Optional
+    // Used for override the default S3 endpoint
+    val usePathStyle: Property<Boolean?> = project.objects.property(Boolean::class.java)
+
+    @get:Input
+    @get:Optional
     // Optional: Used for override the default accessKey
     val accessKey: Property<String?> = project.objects.property(String::class.java)
 

@@ -17,6 +17,7 @@ abstract class S3AptRepositoryPluginExtension(val project: Project) {
     abstract val bucketPath: Property<String>
     abstract val region: Property<String>
     abstract val endpoint: Property<String>
+    abstract val usePathStyle: Property<Boolean>
 
     /** Override Versions that already exist in Apt Repository, Default is true */
     abstract val override: Property<Boolean>
