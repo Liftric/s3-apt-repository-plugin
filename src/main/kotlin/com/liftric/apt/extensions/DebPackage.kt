@@ -7,12 +7,13 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.InputFile
 
 @Suppress("MemberVisibilityCanBePrivate")
 @ConfigDsl
 class DebPackage(@get:Internal val project: Project) {
 
-    @get:Input
+    @get:InputFile
     // The Package file to upload. Currently only Debian Files are supported */
     val file: RegularFileProperty = project.objects.fileProperty()
 

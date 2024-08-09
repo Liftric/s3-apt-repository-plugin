@@ -42,7 +42,7 @@ abstract class UploadPackage : DefaultTask() {
     @get:Optional
     abstract val override: Property<Boolean>
 
-    @get:Input
+    @get:InputFile
     @get:Optional
     abstract val signingKeyRingFile: RegularFileProperty
 

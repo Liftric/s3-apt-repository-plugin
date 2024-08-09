@@ -38,7 +38,7 @@ abstract class RemovePackage : DefaultTask() {
     @get:Optional
     abstract val endpoint: Property<String>
 
-    @get:Input
+    @get:InputFile
     @get:Optional
     abstract val signingKeyRingFile: RegularFileProperty
 
