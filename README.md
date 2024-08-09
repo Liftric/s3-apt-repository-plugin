@@ -45,6 +45,7 @@ The `uploadPackage` task comes equipped with a range of both required and option
 - **signingKeyPassphrase**: *(Required)* The passphrase for the PGP private key.
 - **bucketPath**: *(Optional)* The path within the bucket to store the Apt Repository. If not specified, the repository is stored at the root of the bucket.
 - **endpoint**: *(Optional)* Custom S3 endpoint. Use this to override the default AWS S3 endpoint.
+- **usePathStyle**: *(Optional)* Boolean value indicating whether to use path-style access for S3 bucket operations. Default is false. Set to true when using S3-compatible storage systems like MinIO, or in specific scenarios with actual S3 where path-style access is required.
 - **override**: *(Optional)* Boolean value indicating whether to override existing version of a Package. By default, it is `true`.
  
 `Release File Attributes` can be override in s3AptRepository or per debPackage
@@ -73,7 +74,7 @@ In the `debPackage` section, you can specify package-specific attributes. These 
 - **packageArchitectures**: *(Required)* Set of architectures that the package supports.
 - **packageName**, **packageVersion**: *(Optional)* These attributes can be used to override the default package name and version extracted form the Debian File.
 - **origin**, **label**, **suite**, **component**, **architectures**, **codename**, **date**, **releaseDescription**, **releaseVersion**, **validUntil**, **notAutomatic**, **butAutomaticUpgrades**, **changelogs**, **snapshots** : *(Optional)* These attributes can be used to override the default Release file fields for the specific package.
-- **accessKey**, **secretKey**, **bucket**, **bucketPath**, **region**, **endpoint**: *(Optional)* These attributes can be used to override their respective top-level attributes for the specific package.
+- **accessKey**, **secretKey**, **bucket**, **bucketPath**, **region**, **endpoint**, **usePathStyle**: *(Optional)* These attributes can be used to override their respective top-level attributes for the specific package.
 
 
 
@@ -91,6 +92,7 @@ The `removePackage` task comes equipped with a range of both required and option
 - **signingKeyPassphrase**: *(Required)* The passphrase for the PGP private key.
 - **bucketPath**: *(Optional)* The path within the bucket to store the Apt Repository. If not specified, the repository is stored at the root of the bucket.
 - **endpoint**: *(Optional)* Custom S3 endpoint. Use this to override the default AWS S3 endpoint.
+- **usePathStyle**: *(Optional)* Boolean value indicating whether to use path-style access for S3 bucket operations. Default is false. Set to true when using S3-compatible storage systems like MinIO, or in specific scenarios with actual S3 where path-style access is required.
 - **origin**: *(Optional)* The value of the 'Origin' field in the Release files. By default, it is 'Debian'.
 
 `Release File Attributes` can be override in s3AptRepository or per debPackage
@@ -117,7 +119,7 @@ In the `debPackage` section, you can specify package-specific attributes. These 
 - **packageArchitectures**: *(Required)* Set of architectures that the package supports.
 - **packageName**, **packageVersion**: *(Optional)* These attributes can be used to override the default package name and version extracted form the Debian File.
 - **origin**, **label**, **suite**, **component**, **architectures**, **codename**, **date**, **releaseDescription**, **releaseVersion**, **validUntil**, **notAutomatic**, **butAutomaticUpgrades**, **changelogs**, **snapshots** : *(Optional)* These attributes can be used to override the default Release file fields for the specific package.
-- **accessKey**, **secretKey**, **bucket**, **bucketPath**, **region**, **endpoint**: *(Optional)* These attributes can be used to override their respective top-level attributes for the specific package.
+- **accessKey**, **secretKey**, **bucket**, **bucketPath**, **region**, **endpoint**, **usePathStyle**: *(Optional)* These attributes can be used to override their respective top-level attributes for the specific package.
 
 
 ### cleanPackages
@@ -130,6 +132,7 @@ The `cleanPackages` task comes equipped with a range of both required and option
 - **secretKey**: *(Required)* The AWS Secret Key for accessing the S3 bucket. Can be overridden in the `debPackage` section.
 - **bucketPath**: *(Optional)* The path within the bucket to store the Apt Repository. If not specified, the repository is stored at the root of the bucket.
 - **endpoint**: *(Optional)* Custom S3 endpoint. Use this to override the default AWS S3 endpoint.
+- **usePathStyle**: *(Optional)* Boolean value indicating whether to use path-style access for S3 bucket operations. Default is false. Set to true when using S3-compatible storage systems like MinIO, or in specific scenarios with actual S3 where path-style access is required.
 - **suite**: *(Optional)* The value of the 'Suite' field in the Release files. By default, it is 'stable'.
 - **component**: *(Optional)* The value of the 'Component' field in the Release files. By default, it is 'main'.
 
