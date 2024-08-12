@@ -7,12 +7,13 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.InputFile
 
 @Suppress("MemberVisibilityCanBePrivate")
 @ConfigDsl
 class DebPackage(@get:Internal val project: Project) {
 
-    @get:Input
+    @get:InputFile
     // The Package file to upload. Currently only Debian Files are supported */
     val file: RegularFileProperty = project.objects.fileProperty()
 
@@ -35,6 +36,11 @@ class DebPackage(@get:Internal val project: Project) {
     @get:Optional
     // Used for override the default S3 endpoint
     val endpoint: Property<String?> = project.objects.property(String::class.java)
+
+    @get:Input
+    @get:Optional
+    // Used to force s3 path style access 
+    val usePathStyle: Property<Boolean?> = project.objects.property(Boolean::class.java)
 
     @get:Input
     @get:Optional

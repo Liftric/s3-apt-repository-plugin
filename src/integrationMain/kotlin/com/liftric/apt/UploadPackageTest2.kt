@@ -59,7 +59,7 @@ import com.netflix.gradle.plugins.deb.Deb
 
 plugins {
     id("com.liftric.s3-apt-repository-plugin")
-    id("com.netflix.nebula.ospackage") version "11.3.0"
+    id("com.netflix.nebula.ospackage") version "11.9.1"
 }
 
 group = "com.liftric.test"
@@ -88,6 +88,7 @@ s3AptRepository {
     bucket.set("$UPLOAD_PACKAGE_TEST_BUCKET_2")
     region.set("eu-central-1")
     endpoint.set("http://localhost:${MINIO_CONTAINER.getMappedPort(MINIO_PORT)}")
+    usePathStyle.set(true)
     accessKey.set("$MINIO_ACCESS_KEY")
     secretKey.set("$MINIO_SECRET_KEY")
     signingKeyPassphrase.set("$SIGNING_KEY_PASSPHRASE")

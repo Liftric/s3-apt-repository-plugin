@@ -36,6 +36,10 @@ abstract class CleanPackages : DefaultTask() {
     @get:Optional
     abstract val endpoint: Property<String>
 
+    @get:Input
+    @get:Optional
+    abstract val usePathStyle: Property<Boolean>
+
     @TaskAction
     fun main() {
         val suiteValue = suite.get()
@@ -46,8 +50,9 @@ abstract class CleanPackages : DefaultTask() {
         val bucketPathValue = bucketPath.get()
         val regionValue = region.get()
         val endpointValue = endpoint.orNull
+        val usePathStyleValue = usePathStyle.getOrElse(false)
 
-        val s3Client = AwsS3Client(accessKeyValue, secretKeyValue, regionValue, endpointValue)
+        val s3Client = AwsS3Client(accessKeyValue, secretKeyValue, regionValue, endpointValue, usePathStyleValue)
 
         val usedPackages = getUsedPackagesPoolKeys(s3Client, bucketValue, bucketPathValue, suiteValue, componentValue)
         cleanPackages(logger, s3Client, bucketValue, bucketPathValue, componentValue, usedPackages)

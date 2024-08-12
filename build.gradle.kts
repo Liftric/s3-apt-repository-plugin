@@ -55,20 +55,16 @@ tasks {
 gradlePlugin {
     val integrationMain by sourceSets
     testSourceSets(integrationMain)
+    website.set("https://github.com/Liftric/s3-apt-repository-plugin")
+    vcsUrl.set("https://github.com/Liftric/s3-apt-repository-plugin")
     plugins {
         create("s3-apt-repository-plugin") {
             id = "$group.s3-apt-repository-plugin"
             implementationClass = "$group.apt.S3AptRepositoryPlugin"
             displayName = "s3-apt-repository-plugin"
+            tags.set(listOf("s3", "apt", "repository", "debian"))
         }
     }
-}
-
-pluginBundle {
-    website = "https://github.com/Liftric/s3-apt-repository-plugin"
-    vcsUrl = "https://github.com/Liftric/s3-apt-repository-plugin"
-    description = "A Gradle Plugin for managing an APT Repository on S3"
-    tags = listOf("s3", "apt", "repository", "debian")
 }
 
 dependencies {
