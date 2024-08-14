@@ -62,6 +62,7 @@ gradlePlugin {
             id = "$group.s3-apt-repository-plugin"
             implementationClass = "$group.apt.S3AptRepositoryPlugin"
             displayName = "s3-apt-repository-plugin"
+            description = "A Gradle Plugin for managing an APT Repository on S3"
             tags.set(listOf("s3", "apt", "repository", "debian"))
         }
     }
